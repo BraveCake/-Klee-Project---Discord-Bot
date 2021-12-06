@@ -1,0 +1,1147 @@
+import discord
+import os
+from keep_alive import keep_alive
+from threading import Thread
+import random
+import json
+from bs4 import BeautifulSoup
+import re
+import hashlib
+from discord.ext import tasks, commands
+import asyncio
+from datetime import datetime
+from time import sleep
+from replit import db
+import pytz 
+import requests
+import urllib3
+kw = ["spam","ping","team-ping","wm","anonymous","status",'apps_notifier']
+intents = discord.Intents.default()
+intents.members = True
+def get_complete_hash(user,passwrd,session):
+  return hex_sha1(bytes(hex_sha1(user.encode("utf-8").lower()+passwrd.encode("utf-8")),'utf-8')+bytes(session,'utf-8'))
+def has_mora(source,amount):
+  coins = open('coins.txt','r')
+  amount = int(amount)
+  for l in coins:
+    l = l.split(':',2)
+    if(l[0]==source):
+      if(int(l[1])>=amount):
+        coins.close()
+        return True
+      else:
+        coins.close()
+        return False
+  coins.close()
+  return False
+def send_mora(source,target,amount):
+  amount = int(amount)
+  coins = open('coins.txt','r')
+  content = ''
+  for l in coins:
+      ol = l.split(':',2)
+      if(ol[0]==source):
+        source = ol
+      elif(ol[0]==target):
+        target = ol
+      else:
+        content = content +l
+  coins.close()
+  coins = open('coins.txt','w')
+  coins.write(content)
+  print(source)
+  print(target)
+  if(not isinstance(target,list)):
+    target = [target,'0','0\n']
+  if(source!='000'): #system
+   coins.write(source[0]+':'+str(int(source[1])-amount)+':'+source[2])
+  coins.write(target[0]+':'+str(int(target[1])+amount)+':'+target[2])
+  coins.close()
+  return True
+
+def hex_sha1(value):
+   return hashlib.sha1(value).hexdigest()
+def get_authenticity_token(html):
+    soup = BeautifulSoup(html, "html.parser")
+    token = soup.find_all('input', attrs={'type': 'hidden'})
+    if not token:
+        print('could not find `authenticity_token` on login form')
+    result = [token[2].get('name'),token[2].get('value')]
+    return result
+@tasks.loop(minutes=60.0)
+async def lottery():
+     if(os.path.getsize("lottery.txt")==0):
+       return
+     lottery = open('lottery.txt','r')
+     winner = str(random.randint(1,20))
+     response= "Ticket "+str(winner)+" is the lucky one of this lottery!"
+     for l in lottery:
+       l= l.split(':')
+       if(l[1].lstrip()==winner):
+         winner = l
+         break
+     if(isinstance(winner,list)):
+         response = response+os.linesep+ await client.fetch_user(winner[0])
+         send_mora('000',winner[0],'50000')
+     else:
+        response = response + os.linesep+"Unfortunately none was able to win it!!"
+     await client.get_channel(464028850091851786).send(response)
+     lottery.close()
+     lottery = open('lottery.txt','w')
+     lottery.close()
+@tasks.loop(minutes=5.0)
+async def get_updates():
+    response = requests.get("https://cit.gg/")
+    d = 0
+    content = ''
+    days  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    for l in response.iter_lines():
+      if(d<5 and str(l).startswith("b'<div class=\"sp_block\">")):
+        d = d+1
+      if(d>5):
+       for day in days:
+        if( str(l).lstrip("b'<br />").startswith(day)):
+          d=-1
+          break
+      if(d==-1):
+        break;
+      if(d>=5 ):
+        if(d==5):
+         l= str(l).replace("b'<div class=\"sp_block\">",'') 
+        content = content+ str(l).strip('\'').strip('b').strip("'").strip('"').strip('<br />')+'\n'
+        d=d+1
+    if(content!=db['updates']):
+     db['updates']=content
+     channel= client.get_channel(860293711228043264)
+     await channel.send(content)
+    if(db['apps_notifier']!='false'):
+     res = connect2forum('https://cit.gg/index.php?board=471.0')
+     soup = BeautifulSoup(res,"html.parser")
+     element = soup.find("td", {"class": "stats windowbg"})
+     current_apps=element.find("p").get_text(separator="*").split('*',1)[1]  
+     if(db['__apps__']!=current_apps):
+       await client.get_channel(589805576171552769).send('~Ara ~ ara there is a new applicant <:KleeE:867193529620103179>')
+       db['__apps__']=current_apps
+       res = connect2forum("https://cit.gg/index.php?board=852.0")
+       soup = BeautifulSoup(res,"html.parser")
+       element = soup.findAll('a',href=True)[66]['href']
+       res = connect2forum(element)
+       soup = BeautifulSoup(res,"html.parser")
+       app = soup.find("div", {"class": "windowbg"})
+       app_h = open('app_h.txt','w')
+       app_h.write(app.get_text(separator='\n').split('Quote',1)[1].split('Logged',1)[0].strip())
+       app_h.close()
+       app_h = open('app_h.txt','r')
+       await client.get_channel(589805576171552769).send(file=(discord.File(app_h)))
+       app_h.close()
+
+def rgb_to_hex(r,g,b):
+    return '%02x%02x%02x' % (r, g, b)
+def hex_to_rgb(hex):
+    hex= hex.lstrip('#')
+    rgb = [int(hex[0:2],base=16),int(hex[2:4],base=16),int(hex[4:6],base=16)]
+    return "#"+hex+" equivalent rgb value is "+str(rgb).strip('[]')
+def connect2forum(url):
+    cit= requests.Session()
+    response = cit.get('https://cit.gg/index.php')
+    headers = {
+    'authority': 'cit.gg',
+    'cache-control': 'max-age=0',
+    'upgrade-insecure-requests': '1',
+    'origin': 'https://cit.gg',
+    'content-type': 'application/x-www-form-urlencoded',
+    'user-agent': 'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-user': '?1',
+    'sec-fetch-dest': 'document',
+    'referer': 'https://cit.gg/index.php?action=login',
+    'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    }
+    params = (
+    ('action', 'login2'),
+    )
+    token = get_authenticity_token(response.text)
+    hash = get_complete_hash('Klee',os.getenv('PASSWORD'),token[1])
+    data = {
+    'user': 'Klee',
+    'passwrd': '',
+    token[0]: token[1],
+    'hash_passwrd': hash
+    }
+    cookies = {'SMFCookieCIT':'a%3A4%3A%7Bi%3A0%3Bs%3A5%3A%2288695%22%3Bi%3A1%3Bs%3A40%3A%22b80b839d4a894f7db10aea8316ac3802e703bee8%22%3Bi%3A2%3Bi%3A1816020670%3Bi%3A3%3Bi%3A2%3B%7D','PHPSESSID':cit.cookies.get_dict()['PHPSESSID']}
+    res = cit.post('https://cit.gg/index.php?action=login2', headers=headers, params=params, data=data,cookies=cookies)
+    res = cit.get(url,
+    headers=headers, cookies=cookies)
+    return res.text
+    
+def getCitTime():
+ London_tz = pytz.timezone('Europe/Paris')
+ ct = datetime.now(London_tz)
+ return ct.strftime("%H:%M:%S")
+def calculate(message):
+  content = message.split('!calculate ',1)[1]
+  if( re.search('[a-zA-Z]+',content)):
+    return
+  return eval(content.replace("^","**"))
+def rollDice(message):
+  x= int(message.split(' ',2)[1])
+  return random.randint(0,x-1)+1
+client = discord.Client(intents= intents)
+async def cursed(message):
+  curse = open('curse.txt','r')
+  cm=0
+  try :
+   for l in curse:
+     curse_info = l.split(':')
+     curse_info[1]= curse_info[1].replace(os.linesep,'')
+     if(curse_info[0]==str(message.author.id)):
+       print(curse_info)
+       if(curse_info[1]=='1'):
+          print("c1")
+          await message.delete()
+          cm= 2
+       elif curse_info[1] =='2' :
+         print("c2")
+         cm= 1
+       elif curse_info[1] == '3' and cm<2:
+         print("c3")
+         target = await client.fetch_user(curse_info[0])
+         target =  message.guild.get_member(target.id)
+         await message.add_reaction('🐷')
+         await target.edit(nick='Loser')
+       elif curse_info[1]=='4' and cm<2:
+         if(re.search('<:\w+:\d+>', message.content)or re.search('<\w+:\w+:\d+>', message.content) ):
+           await message.delete()
+       elif curse_info[1]=='5' and cm<2:
+         print("c5")
+         spam_ratio = random.randint(0,100)
+         print (spam_ratio)
+         if(spam_ratio<51):
+           target = '<@'+curse_info[0]+'>'
+           tm = await message.channel.send(target)
+           await tm.delete()
+       elif curse_info[1].startswith('p') and cm<2:
+           print("cp")
+           if(len(curse_info)>2):
+             await message.add_reaction(discord.utils.get(client.emojis,name=curse_info[2]))
+             continue
+           emo=str(curse_info[1].split('+')[1])
+           for c in range(0,len(emo)):
+             await message.add_reaction(emo[c])
+  finally :
+      curse.close()
+      return cm
+async def modifyRole(ctx,id,role,controller):
+   role = discord.utils.get(ctx.guild.roles,name=role)
+   target=ctx.guild.get_member(int(id.replace('>','').replace('<','').replace('!','').replace('@','')))
+   if(controller==1):
+    await target.add_roles(role)
+   else:
+     await target.remove_roles(role)
+    
+        
+
+@client.event
+async def on_ready():
+    get_updates.start()
+    lottery.start()
+    print('we have logged in as {0.user}'.format(client))
+    if(db['status']!='default'):
+      await client.change_presence(activity=discord.Game(name=db['status']))
+sev = '#FFFFFF'    
+cs=0
+o=''
+limiter = False
+@client.event
+async def on_message(message):
+  print(message.content)
+  dashboard=  'so-klee'   #dashboard = name of the channel in which you can have highest acces to klee
+  global cs,m,sev,limiter,kw
+  ch= await cursed(message) 
+  if ch > 0 and message.channel.id!=815610398039867402: #dashboard
+    return 
+  if(message.author == client.user):
+     return
+  if message.guild is None:
+    print("Detected an attempt to use me outside State Official Server")
+  EXSO_R = discord.utils.get((message.guild).roles, id = 742746161563041822)
+  guest_R = discord.utils.get(message.guild.roles, id=769304697127174186)
+  SO_R = discord.utils.get(message.guild.roles, name = "State Official")
+  AHSO_R = discord.utils.get(message.guild.roles, name = "Assistant Head State Official")
+  HSO_R = discord.utils.get(message.guild.roles, name = "Head State Official")
+  HSO_R = discord.utils.get(message.guild.roles, name = "Head State Official")
+  TSO_R= discord.utils.get(message.guild.roles, name = "Trial State Official")
+  emperor = discord.utils.get(message.guild.roles, name="Gulag Emperor") 
+  prisoner_R = discord.utils.get(message.guild.roles, name="Gulag Prisoner")#Server Role Objects
+  if(cs==1):
+    cs=0
+    if not message.content.startswith('There are '):
+      return
+    sleep(3.3)
+
+    
+    return
+  response = requests.get("http://jarno.pro/stuff/api/ab.php")
+  players = response.json()['RESULTS']
+  if(message.content.lower()=='klee'):
+    await message.channel.send(' Ta-da! Klee is here!')
+  ms= message.content
+  if(ms.find(':')!=-1 and (ms.find('(SO)')!=-1 or ms.find('TEAM')!=-1)):
+    ms = ms.split(':',2)[1]
+  ms = ms.lstrip()
+  if(db['status']=='default' and message.content.startswith('There') and message.author.id ==462940393093201921):
+    await client.change_presence(activity=discord.Game(name="with "+str(message.content.split('**',2)[1])+" State Officials"))
+
+  if(message.channel.name!='civilian-teamsay'):
+   if(ms=='!online'):
+    tc = client.get_channel(461207618183233557)
+    m= client.get_channel(message.channel.id)
+    temp = await tc.send('.online')
+    await temp.delete()
+    s= 1.3
+    if(ms!=message.content):
+      s=3.3
+    await asyncio.sleep(1.3)
+    async for msg in tc.history(limit=50):
+      if msg.content.startswith('There are '):
+            temp = msg.content.replace('**','')
+            await msg.delete()
+            if(s==3.3):
+              await asyncio.sleep(1.3)
+            await message.channel.send(temp)
+            return
+  if(message.content.startswith('!logs')):
+    if(message.channel.id!=810279347251839026 and  message.channel.name!=dashboard): #so-logs
+          await message.channel.send('You do not have permission to use this command!')
+          return
+    if(limiter==True):
+      await message.channel.send('there is already an operation on progress')
+      return
+    limiter = True
+    c=0
+    date_str ='0'
+    try:
+     date_str = message.content.split(' ',3)[2]
+     sp = datetime.strptime(date_str, '%Y-%m-%d') 
+    except:
+      limiter = False
+    target = message.content.split(' ',2)[1]
+    if(not message.content.startswith('!logs+')):
+     target = message.content.split(' ',2)[1].lower()
+    tc= client.get_channel(462841576616361987)
+    delm = await message.channel.send('Gathering data...')
+    async for msg in tc.history(limit=None, after= sp ):
+     if(msg.content.find('(TEAM) ')==-1):
+       continue
+     user = msg.content.split(':',2)[0].replace("(TEAM) ",'')
+     if(not message.content.startswith('!logs+')):
+      user= msg.content.split(':',2)[0].replace("(TEAM) ",'').lower()
+     print(c)
+     if user.find(target)!=-1:
+       c=c+1
+    await delm.delete()
+    output = target+" has "+str(c)+" lines "
+    if(not message.content.endswith('x')):
+       output=output+message.author.mention+"\n"  
+    await message.channel.send(output)
+    limiter = False
+
+
+  elif(message.content.startswith('!lines')):
+    if(message.channel.id!=810279347251839026 and message.channel.name!=dashboard): #so-logs
+          await message.channel.send('You do not have permission to use this command!')
+          return
+    if(limiter==True):
+      await message.channel.send('there is already an operation on progress')
+      return
+    limiter = True
+    c=0
+    date_str='0'
+    try:
+     date_str = message.content.split(' ',3)[2]
+     sp = datetime.strptime(date_str, '%Y-%m-%d') 
+     target = message.content.split(' ',2)[1]
+    except:
+      limiter = False
+    if(not message.content.startswith('!lines+')):
+     target = message.content.split(' ')[1].lower()
+    if (target.find(',')!=-1):
+      target = target.split(',')
+    else :
+      target = [target]
+    for t in target:
+     f= open(t+' '+date_str+'.txt','w+')
+     tc= client.get_channel(462841576616361987)
+    # 462841576616361987
+     delm = await message.channel.send('Gathering data...')
+     async for msg in tc.history(limit=None, after= sp ):
+      if(msg.content.find('(TEAM) ')==-1):
+        continue
+      user = msg.content.split(':',2)[0].replace("(TEAM) ",'')
+      if(not message.content.startswith('!lines+')):
+       user= msg.content.split(':',2)[0].replace("(TEAM) ",'').lower()
+      print(c)
+      if user.find(t)!=-1:
+        f.write(str(msg.created_at)+" "+msg.content+'\n')
+        c=c+1
+     output = t+" has "+str(c)+" lines "
+     if(not message.content.endswith('x')):
+       output=output+message.author.mention+"\n"
+     f.close()
+     await delm.delete()
+     fr = open(t+' '+date_str+'.txt','r')
+     await message.channel.send(output)
+     await message.channel.send(file=(discord.File(fr)))
+     fr.close()
+     os.remove(t+' '+date_str+'.txt')
+     c=0
+    limiter = False
+  elif(message.content.startswith('.say')):
+    if(message.channel.id == 462841576616361987) : #team-chat
+      return
+    if(message.channel.id!=461207618183233557): #so-ingame
+      await message.channel.send("You don't have permission to use this command") 
+      return
+    m = message.content.replace('.say','')
+    await message.delete()
+    await asyncio.sleep(3.3)
+    author = ' ('+str(message.author)+')'
+    if db['anonymous']!='false':
+       author=""
+    if(sev!='special'):
+     await message.channel.send("#FFCA33"+author+" : "+str(sev)+m)
+    else:
+       print('special')
+       color = {"blue":"#0000FF","green":"#008000","yellow":"#ffff00","red":"#FF0000","white":"#FFFFFF","black":"#000000","pink":"#ffc0cb","purple":"#8f2eff"}
+       t = []
+       for e in m:
+         t.append(e)
+       m= t
+       counter = 0
+       counter2 =0
+       keys = list(color.keys())
+       while (counter<len(m)):
+         m.insert(counter,color[keys[random.randint(0,7)]])
+         counter = counter+2
+         if(counter2>=len(color)):
+           counter2=0
+
+       out = ''
+       for l in m:
+         out += l
+       m= out
+       await message.channel.send("#FFCA33"+author+" : "+m)
+       
+  elif(message.content.startswith('!say ')):
+    if(message.channel.id==461207618183233557): #so in game
+      return
+    m = message.content.replace('!say ','',1)
+    await message.delete()
+    if(message.channel.id!=462841576616361987):
+      await message.channel.send(m)
+      return
+    author = ' ('+str(message.author)+')'
+    if(db['anonymous']!='false'):
+      author = ''
+    await message.channel.send(".say #FFCA33"+str(message.author)+" : #FFFFFF "+m)
+
+  if (message.content.startswith('!rolldice')):
+    await message.channel.send(rollDice(message.content))
+  if (message.content.startswith('!raisemf')):
+        await message.channel.send("https://cdn.discordapp.com/attachments/810279347251839026/810286648171429938/81614871ee87f58b9c92813992e7824d_3927207100981871021.png")
+  elif (message.content.startswith('!fire1')):
+        await message.channel.send("https://safebooru.org//samples/3114/sample_d02e1cd07c1500778456d10eb4989e9801fe6770.jpg?3240692")
+  elif (message.content.startswith('!fire3')):
+        await message.channel.send("https://images.wallpapersden.com/image/download/klee-red-eyes-genshin-impact_bGlnbmaUmZqaraWkpJRnZWltrWdlaW0.jpg")
+  elif (message.content.startswith('!fire2')):
+        await message.channel.send("https://img-9gag-fun.9cache.com/photo/aR79LGM_460s.jpg")
+  elif( message.content.startswith('!khelp')):
+    helpf= open('help.txt','r')
+    helpl = discord.Embed(title="List of commands", description=helpf.read(), color=int("0x"+"FFD700",16))
+    await message.channel.send( embed =helpl)
+    helpf= open('help2.txt','r')
+    helpl = discord.Embed(title="List of commands page 2", description=helpf.read(), color=int("0x"+"FFD700",16))
+    await message.channel.send( embed =helpl)
+  elif message.content.startswith("!calculate"):
+    await message.channel.send(calculate(message.content))
+  elif message.content.startswith('!activate'):
+    await message.channel.send('.dverify 6411481')
+  elif message.content.startswith('!money1'):
+        await message.channel.send('https://i.imgur.com/u8YIvwR.png')
+  elif message.content.startswith('!money2'):
+        await message.channel.send('https://cdn.discordapp.com/attachments/589805576171552769/812157150523949066/unknown.png')
+  elif message.content.startswith('!stats'):
+    target = message.content.split(' ',2)[1]
+    response = requests.get("http://jarno.pro/stuff/api/ab.php")
+    players = response.json()['RESULTS']
+    for player in players:
+     if(player['name'].find(target)!=-1 or  player['name'].lower().find(target.lower())!=-1 ):
+       target = "Occupation:"+str(player['occupation'])+"\nCash: "+str(player['cash'])+'$\nPlaytime: '+str(int(player['playtime'])/60)+'H\nGroup: '+str(player['gang'])+'\nSquad: '+str(player['squad'])+"\nCountry: "+str(player['country'])+"\nPing: "+str(player['ping'])
+       c = str(player['color']).replace('[','').replace(']','').replace("'","").split(',',3)
+       c = rgb_to_hex(int(c[0]),int(c[1]),int(c[2]))
+       print(c)
+       color = discord.Embed(title=str(player['name']), description=target, color=int("0x"+c,16))
+       await message.channel.send( embed =color)
+       return
+    await message.channel.send("Target not found") 
+  elif message.content.startswith('!grouponline'):
+    target = message.content.split(' ',2)[1]
+    result =''
+    count =0
+    for player in players:
+      if(player['gang']==target):
+        count = count +1
+        if(result!=''):
+         result = result+', '
+        result = result +str(player['name'])
+    if(result==''):
+      await message.channel.send("Target not found")
+    else:
+     await message.channel.send(target+' has '+str(count)+" online player(s) : "+result)
+  elif message.content.startswith('!squadonline'):
+    target = message.content.split(' ',2)[1]
+    result =''
+    count =0
+    for player in players:
+      if(player['squad']==target):
+        count = count+1
+        if(result!=''):
+         result = result+', '
+        result = result +str(player['name'])
+    if(result==''):
+      await message.channel.send("Target not found")
+    else:
+     await message.channel.send(target+' has '+str(count)+" online player(s) : "+result)
+  elif ms== ('!players'):
+    if (int(response.json()['COUNT_RESULTS'])==1):
+          await message.channel.send("There are "+'1'+" online player(s) in game")
+    else:
+      await message.channel.send("There are "+str(int (response.json()['COUNT_RESULTS']))+" online player(s) in game")
+  elif ms =='!civilians':
+    count =0;
+    for x in players:
+      if(x['team']=='Unoccupied'):
+        count = count+1
+    await message.channel.send("There are "+str(count)+" online civilian player(s) in game")   
+  elif ms =='!board':
+    await message.channel.send('https://cit.gg/index.php?board=471.0')
+  elif message.content.startswith('!set '):
+    value = message.content.split(' ',2)[1].lower()
+    color = {"blue":"#0000FF","green":"#008000","yellow":"#ffff00","red":"#FF0000","white":"#FFFFFF","black":"#000000","pink":"#ffc0cb","purple":"#8f2eff","rainbow":"special"}
+    value = color[value]
+    if( value is None):
+      sev=''
+      await message.channel.send('please use a valid color name')
+      return
+    await message.channel.send('color has been set successfully to '+message.content.split(' ',2)[1].lower())
+    sev=value
+  elif message.content.startswith('!kill'):
+    if message.channel.name!=dashboard:
+       return
+    else :
+     await client.logout()
+  elif message.content =='!klee':
+   await message.channel.send('https://cdn.discordapp.com/attachments/815610760205565952/817041086190977064/ezgif-2-49a8333fb4f2.gif')
+  elif ms.startswith('!time '):
+    await message.channel.send(getCitTime())
+  elif message.content.startswith('!dictionary'):
+    keys=''
+    for value in db:
+     if(value in kw):
+        continue
+     keys = keys+"\n"+value
+    await message.channel.send(keys)
+  elif ms.startswith('!learn '):
+    if ms!=message.content:
+        return
+    key=''
+    value=''
+    try:
+     key ='!'+ms.split(' ',2)[1]
+     if(key in kw):
+       return
+     value = ms.split(' ',2)[2]
+    except:
+      print('exception in learning block')
+      return
+    if(key==''):
+       return
+    if((key=='inactive'or key=='roster') and not HSO_R  in message.author.roles and not AHSO_R in message.author.roles) and message.channel.name !=dashboard:
+      return
+    db[key]=value
+    await message.add_reaction('✅')
+    return
+  elif message.content.startswith('!forget '):
+    if(message.channel.name!=dashboard):
+      return
+    try:
+     key = '!'+message.content.split(' ')[1]
+     del db[key]
+    finally:
+       await message.add_reaction('✅')
+       return
+    return 
+  elif message.content.startswith("!forgetall*"):
+    if(message.channel.name!=dashboard):
+        return
+    for key in db:
+      del db[key]
+    await message.channel.send('done')
+  elif message.content.startswith('!send2gulag'):
+    if(emperor not in message.author.roles ):
+      return
+    target = message.content.split(' ',1)[1].lstrip('<').rstrip('>').rstrip('@').rstrip('!').strip()
+    target =  message.guild.get_member(int(target))
+    await target.add_roles(prisoner_R)
+    gulag = open('gulag.txt','a')
+    gulag.write(str(target.id)+":")
+    rs=0
+    try:
+     if(EXSO_R in target.roles):
+       await target.remove_roles(EXSO_R)
+       gulag.write('EXSO')
+       rs= rs+1
+     if(guest_R in target.roles):
+       await target.remove_roles(guest_R)
+       if(rs>0):
+         gulag.write('+')
+       gulag.write('guest')
+       rs= rs+1
+     if(SO_R in target.roles):
+       await target.remove_roles(SO_R)
+       if(rs>0):
+         gulag.write('+')
+       gulag.write('SO')
+       rs= rs+1
+     if(TSO_R in target.roles):
+       await target.remove_roles(TSO_R)
+       if(rs>0):
+         gulag.write('+')
+       gulag.write('TSO')
+       rs= rs+1
+     if(AHSO_R in target.roles):
+       await target.remove_roles(AHSO_R)
+       if(rs>0):
+         gulag.write('+')
+       gulag.write('AHSO')
+       rs= rs+1
+     gulag.write(os.linesep)
+     await target.send('Welcome to the gulag')
+    except:
+       print('gulag exception')
+    finally:
+         gulag.close()
+
+  elif message.content.startswith('!rgb2hex'):
+    rgb = message.content.split(' ')
+    trgb= rgb[1]+' '+rgb[2]+' '+rgb[3]
+    rgb = rgb_to_hex(int(rgb[1]),int(rgb[2]),int(rgb[3]))
+    rgb =  discord.Embed(title='The hex value of '+trgb, description=rgb.upper(), color=int("0x"+rgb,16))
+    await message.channel.send(embed=rgb)  
+  elif message.content.startswith('!spam'):
+    if(db["spam"]=="false"):
+      return
+    l= " "
+    word = message.content.split(' ',2)[2]
+    times = int(message.content.split(' ',2)[1])
+    print(times)
+    if(times>100):
+      await message.channel.send('that is too much')
+      return
+    for x in range (int(times)):
+      if(db["spam"]=="false"):
+         return
+      await message.channel.send(word+l)
+  elif message.content.startswith('!pingme'):
+   ping = open("ping.txt",'a+')
+   target = message.content.split(' ',2)
+   ping.write(target[1]+":"+message.author.mention+os.linesep)
+   ping.close()
+   await message.channel.send('added successfully to @ping-list')
+  elif ms.startswith('!ping '):
+    print(ms)
+    if(db["ping"]=="false"):
+      return
+    if(message.channel.id==462841576616361987 and db['team-ping']=='false'): 
+            if(ms.content!=message.content):
+              return 
+    target=''
+    try:
+     target = ms.split(' ',2)[1]
+    except:
+     return
+    ping = open("ping.txt","r")
+    for t in ping:
+     user = t.split(':',1);
+     if(user[0]==target):
+       await message.channel.send(user[1])
+       ping.close()
+       return
+    ping.close()
+  elif message.content =='!ping-list':
+    ping = open('ping.txt','r')
+    output = ''
+    for l in ping:
+      p = l.split(':')
+      member = await client.fetch_user(p[1].replace('<','').replace('>','').replace('@','').replace('!','')) #fuckin too lazy to import re for using regex
+      output = output+p[0]+':'+member.name+'\n'
+    await message.channel.send(output)
+    ping.close()
+  elif message.content.startswith('!free'):
+    if(not emperor in message.author.roles)and message. author.id!= 279803864033787905:
+      return
+    target =  message.content.split(' ',1)[1].lstrip('<').rstrip('>').rstrip('@').rstrip('!').strip()
+    gulag = open('gulag.txt','r')
+    output= ''
+    user =  message.guild.get_member(int(target))
+    await user.remove_roles(prisoner_R)
+    for prisoner in gulag:
+      if(prisoner.split(':')[0]==target):
+        roles = prisoner.split(':')[1].split('+')
+        print(target)
+        print (user.name)
+        for r in roles:
+          r=r.rstrip(os.linesep)
+          if(r=='AHSO'):
+           await user.add_roles(AHSO_R)
+          if(r=='SO'):
+            await user.add_roles(SO_R)
+          if(r=='TSO'):
+            await user.add_roles(TSO_R)
+          if(r=='guest'):
+            await user.add_roles(guest_R)
+          if(r=='EXSO'):
+            await user.add_roles(EXSO_R)
+      else : 
+        output= output+prisoner
+    gulag.close()
+    gulag = open('gulag.txt','w')
+    gulag.write(output)
+  elif message.content.startswith('!curse ') or message.content.startswith('!poison'):
+    if(not HSO_R in message.author.roles and not message.author.id==279803864033787905): #ixi
+      if(message.content.startswith('!poison')):
+         if(random.randint(1,100)>25):
+           return
+      else:
+         return
+    curse_info = message.content.split(' ',2)
+    p= False;
+    if(message.content.startswith('!poison')):
+       p=True;
+    target=0
+    em=0
+    if p:
+       target = curse_info[1]
+       curse_info[1]='p'
+       if len(curse_info)>2:
+          em = curse_info[2]
+          curse_info[2]=target
+       else:
+           em=''
+           curse_info.append(target)
+       
+    curse = open('curse.txt','a+')
+    curse_info[2]= curse_info[2].replace('<','').replace('>','')  .replace('@','').replace('!','')
+    curse.write(curse_info[2]+':'+curse_info[1])
+    if(p):
+     curse.write('+'+em)
+    curse.write(os.linesep)
+    if(not p):
+      target = await client.fetch_user(curse_info[2])
+      await target.send('You have been cursed the only way to remove the curse is to find an exorcist to get rid of it\nhttps://youtu.be/gsZWYqJ2SHs')
+    else:
+      target =  message.guild.get_member(int(curse_info[2]))
+      if(discord.utils.get(message.guild.roles, id=747834986010378300) in target.roles):
+         await target.remove_roles(discord.utils.get(message.guild.roles, id=747834986010378300))
+         return #L50
+      if(discord.utils.get(message.guild.roles, id=747834651716092025) in target.roles):
+         await target.remove_roles(discord.utils.get(message.guild.roles, id=747834651716092025))
+         return #L40
+      if(discord.utils.get(message.guild.roles, id=747834272702005350) in target.roles):
+        await target.remove_roles(discord.utils.get(message.guild.roles, id=747834272702005350))
+        return #30
+      if(discord.utils.get(message.guild.roles,id=465804581788712971) in target.roles):
+        await target.remove_roles(discord.utils.get(message.guild.roles, id=465804581788712971))
+        return #L20
+      if(discord.utils.get(message.guild.roles, id=465803850406821889) in target.roles):
+          await target.remove_roles(discord.utils.get(message.guild.roles, id=465803850406821889))
+          return #L10
+    curse.close()
+  elif message.content.startswith('!remove-curse'):
+    if(not discord.utils.get(message.guild.roles, name = "Exorcist") in message.author.roles):
+      return
+    curse = open('curse.txt','r+')
+    target = message.content.split(' ')[1].replace('<','').replace('>', '').replace('!','').replace ('@','')
+    if(target=='all'):
+      curse = open('curse.txt','w')
+      curse.close()
+      await message.channel.send("all curses have been removed")
+      return
+    output=''
+    for l in curse:
+      if(target==l.split(':')[0]):
+        continue
+      output = output+l
+    curse.close()
+    curse= open('curse.txt','w')
+    curse.write(output)
+    await message.channel.send("The curse has been removed successfully")
+    curse.close()
+  elif message.content.startswith('!banTrials'):
+   for member in message.guild.members:
+     if(message.author.id == member.id):
+      continue
+     if(member.id ==client.user.id):
+       continue
+     if(TSO_R in member.roles):
+       await member.remove_roles(TSO_R)
+       await member.add_roles(SO_R)
+  elif ms.startswith('!play'): #Command for MEE6 no need to report it
+    return
+  elif message.content=='!settings':
+    if message.channel.name!=dashboard:
+       await message.channel.send("You do not have permission to use this command")
+       return
+    listo = ""
+    for key in kw:
+     value = str(db[key])
+     if(key=='wm'):
+        value = str(client.get_channel(int(db["wm"])).name)
+     listo = listo+ key+" : "+ value+os.linesep
+    info = discord.Embed(title="Bot Settings", description=listo, color=int("0x"+"E67E22",16))
+    await message.channel.send(embed = info )
+  elif message.content.startswith('!settings'):
+    input = message.content.split(' ',2)
+    if(input[1] not in kw):
+            return
+    db[input[1]]= input[2]
+    if(input[1]=='status'):
+      await client.change_presence(activity=discord.Game(name=str(input[2])))
+    await message.add_reaction('✅')
+  elif ms.startswith('!count'):
+     threshold = int(ms.split(' ')[1])
+     if(threshold > 60):
+       return
+     for value in range (1,threshold+1):
+         await message.channel.send(value)
+         await asyncio.sleep(3.4)
+     await message.channel.send("counting is over!")
+  elif message.content.startswith('!give-role') or message.content.startswith('!remove-role'):
+   if(not(HSO_R in message.author.roles) and not (AHSO_R in message.author.roles ) and not message.author.guild_permissions.administrator ):
+      return
+   targetNrole = message.content.split(' ',2)
+   if(targetNrole[2]=='Head State Official' and not (HSO_R in message.author.roles) and not message.author.guild_permissions.administrator):
+     return
+   if(message.content.startswith("!give")):
+     await modifyRole(message,targetNrole[1],targetNrole[2],1)
+   else:
+      await modifyRole(message,targetNrole[1],targetNrole[2],0)
+  elif message.content.startswith('!rename'):
+    info = message.content.split(' ',2)
+    info[1]= info[1].replace('>','').replace('<','').replace('!','').replace('@','')
+    target =  message.guild.get_member(int(info[1]))
+    await target.edit(nick= info[2])
+  elif ms.startswith('!convert'):
+    id = message.content.split('?v=')[1]
+    await message.channel.send("https://www.yt-download.org/public/api/button/mp3/"+str(id))
+  elif message.content.startswith('!sing'):
+    client.disconent
+    voice =  await message.author.voice.channel.connect()
+  elif message.content=='!prisoners':
+    info = ''
+    for member in message.guild.members:
+      if(prisoner_R in member.roles and member.id != client.user.id):
+        info += str(member.nick)+'('+str(member.name)+')'+", "
+    await message.channel.send("There are "+str(info.count(","))+" prisoners in the gulag :\n"+info.rstrip(', ')) 
+  elif ms.startswith('!hex2rgb'):
+     await message.channel.send(hex_to_rgb(ms.split(' ',1)[1])) 
+  elif ms.startswith('!stimer'):
+    info = ms.split(' ',2)
+    await message.add_reaction('✅')
+    await asyncio.sleep(int(info[1])*60)
+    await message.reply("time up" if len(info)<3  else info[2])
+  elif message.content=='!updates':
+    response = requests.get("https://cit.gg/")
+    d = 0
+    content = ''
+    days  = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
+    for l in response.iter_lines():
+      if(d<5 and str(l).startswith("b'<div class=\"sp_block\">")):
+        d = d+1
+      if(d>5):
+       for day in days:
+        if( str(l).lstrip("b'<br />").startswith(day)):
+          d=-1
+          break
+      if(d==-1):
+        break;
+      if(d>=5 ):
+        if(d==5):
+         l= str(l).replace("b'<div class=\"sp_block\">",'') 
+        content = content+ str(l).strip('\'').strip('b').strip("'").strip('"').strip('<br />')+'\n'
+        d=d+1
+    await message.channel.send('>>> '+content)
+  elif message.content.startswith('!marry'):
+   target = int(message.content.split(' ')[1].lstrip('<').rstrip('>').lstrip('@').lstrip('!'))
+   if(target==810188667342553159):
+     await message.channel.send('You cannot marry me you truly baka <a:bongo:747346875426013245>')
+     return
+   marry = open('marry.txt','r')
+   for l in marry:
+     l= l.split(':')
+     if(l[0]==str(message.author.id) or str(message.author.id)==l[1].rstrip(os.linesep)):
+       await message.channel.send("You are already married you cannot have another partner!")
+       return
+     if(l[0]==str(target) or l[1].rstrip(os.linesep)==str(target)):
+       await message.channel.send('You cannot marry a married user!')
+       return
+   def check(ctx):
+      if(ctx.author.id ==target and ctx.content.lower()=='yes'):
+        return True
+    
+   await message.channel.send(message.author.mention+" would like to marry you "+message.content.split(' ')[1]+" say yes if you are willing to spend your entire life with him/her")
+   reply =''
+   try:
+     reply =  await client.wait_for("message", check=check, timeout=30)
+   except asyncio.TimeoutError:
+      await message.add_reaction('❌')
+   if(reply):
+     marry = open('marry.txt','r')
+     for l in marry:
+       l= l.split(':')
+       if(l[0]==str(target) or l[1].rstrip(os.linesep)==str(target)):
+        await message.channel.send('You cannot marry a married user!')
+        return
+     marry = open('marry.txt','a')
+     temp= str(message.author.id)
+     marry.write(temp+":"+str(target)+':'+str(message.created_at)+os.linesep)
+     marry.close()
+     await message.channel.send(message.author.mention + ":yin_yang:"+ message.content.split(' ')[1]+"\n A new cople has been born :heart:")
+  elif message.content=='!partner':
+   marry = open('marry.txt','r')
+   for l in marry:
+     l= l.split(':')
+     if(l[0]==str(message.author.id)):
+       partner = message.guild.get_member(int(l[1]))
+       info =  discord.Embed(title="Partner", description='Name:'+partner.name+os.linesep+'Marriage date:'+l[2],color=int("0x"+"FF69B4",16))
+       await message.channel.send(embed = info)
+       return
+       
+
+     elif l[1].rstrip(os.linesep)==str(message.author.id):
+       partner = message.guild.get_member(int(l[0]))
+       info =  discord.Embed(title="Partner", description='Name:'+partner.name+os.linesep+'Marriage date:'+l[2],color=int("0x"+"FF69B4",16))
+       await message.channel.send(embed = info)
+       return
+   await message.channel.send("You need to get married first in order to view your partner info")  
+  elif message.content=='!divorce':
+    marry = open('marry.txt','r+')
+    target = str(message.author.id)
+    status = False
+    output=''
+    for l in marry:
+
+      if(target== l.split(':')[0] or target==l.split(':')[1].rstrip(os.linesep)):
+        status=True
+        continue
+      output = output+l
+    marry.close()
+    marry= open('marry.txt','w')
+    marry.write(output)
+    if(status):
+     await message.channel.send("You have divorced your partner :broken_heart: ")
+    else:
+      await message.channel.send('You are not married to divorce!')
+    marry.close()
+  elif message.content == 'tte':
+    cit= requests.Session()
+    response = cit.get('https://cit.gg/index.php')
+    headers = {
+    'authority': 'cit.gg',
+    'cache-control': 'max-age=0',
+    'upgrade-insecure-requests': '1',
+    'origin': 'https://cit.gg',
+    'content-type': 'application/x-www-form-urlencoded',
+    'user-agent': 'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
+    'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+    'sec-fetch-site': 'same-origin',
+    'sec-fetch-mode': 'navigate',
+    'sec-fetch-user': '?1',
+    'sec-fetch-dest': 'document',
+    'referer': 'https://cit.gg/index.php?action=login',
+    'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+    }
+    params = (
+    ('action', 'login2'),
+    )
+    token = get_authenticity_token(response.text)
+    hash = get_complete_hash('Klee',os.getenv('PASSWORD'),token[1])
+    print(hash)
+    data = {
+    'user': 'Klee',
+    'passwrd': '',
+    token[0]: token[1],
+    'hash_passwrd': hash
+    }
+    print(cit.cookies.get_dict()['PHPSESSID'])
+    cookies = {'SMFCookieCIT':'a%3A4%3A%7Bi%3A0%3Bs%3A5%3A%2288695%22%3Bi%3A1%3Bs%3A40%3A%22b80b839d4a894f7db10aea8316ac3802e703bee8%22%3Bi%3A2%3Bi%3A1626804565%3Bi%3A3%3Bi%3A2%3B%7D','PHPSESSID':cit.cookies.get_dict()['PHPSESSID']}
+    res = cit.post('https://cit.gg/index.php?action=login2', headers=headers, params=params, data=data,cookies=cookies)
+    print("\n \n Done \n")
+    test = open('text.txt','w')
+    test.write(res.text)
+    res = cit.get('https://cit.gg/index.php?board=852.0',headers=headers, cookies=cookies)
+    test.write(res.text)
+  elif message.content =='!roster':
+    res = connect2forum('https://cit.gg/index.php?topic=131282.0')
+    test = open('text.txt','w')
+    test.write(res)
+    soup = BeautifulSoup(res,"html.parser")
+    mydiv = soup.find("div", {"class": "windowbg"})
+    fr = open('froster.txt','w')
+    fr.write(mydiv.get_text(separator='\n').split('Quote',1)[1].strip())
+    fr.close()
+    fr = open('froster.txt','r')
+    await message.channel.send(file=discord.File(fr))
+    fr.close()
+  #elif message.content=='!02!':
+   #db['apps_notifier']='true'
+  elif message.content=='!daily':
+    coins = open('coins.txt','r')
+    content = ''
+    value= random.randint(150,300)
+    ovalue = value
+    current_date = datetime.now().strftime("%d-%m-%y")
+    for l in coins:
+      ol= l.split(':',2)
+      if(ol[0]==str(message.author.id)):
+        
+        print(str(current_date).strip()==ol[2].strip())
+        if(current_date==ol[2].strip()):
+          await message.channel.send("You've already received your daily cash today stop being greedy!")
+          return
+        value = value + int(ol[1])
+      else:
+        content = content+l
+    await message.channel.send('>>> '+str(ovalue)+"$ has been added to your mora account \n"+"your current balance is "+str(value)+"$ now")
+    coins.close()
+    coins = open('coins.txt','w')
+    content= content+str(message.author.id)+':'+str(value)+":"+current_date+os.linesep
+    coins.write(content)
+    coins.close()
+  elif message.content=='!balance' or message.content =='!bal':
+    coins = open('coins.txt','r')
+    for l in coins:
+      if(l.startswith(str(message.author.id))):
+        await message.channel.send('>>> Your current balance is $'+l.split(':',2)[1])
+        coins.close()
+        return
+    await message.channel.send ("what a poor ass you don't even have a mora account")
+    coins.close()
+  elif message.content=='!rich':
+        sorted_dic = {}
+        coins = open('coins.txt','r')
+        for l in coins:
+          v= l.split(":",2)
+          if(not (int(v[1]) in sorted_dic)):
+           user = message.guild.get_member(int(v[0]))
+           if(user is not None):
+             sorted_dic[int(v[1])] = [user.name]
+          else:
+            sorted_dic[int(v[1])].append(message.guild.get_member(int(v[0])).name)
+
+        content=''
+        for x in sorted(sorted_dic,reverse=True):
+          content =content+str(sorted_dic[x]).lstrip('[').rstrip(']').replace('\'','')+' : '+str(x)+'\n'+" "
+        await message.channel.send(">>> ★"+content)
+        coins.close()
+        return
+  elif message.content.startswith('!sm '):
+    info = message.content.split(' ')
+    amount = info[2]
+    target = info[1].rstrip('>').lstrip('<').lstrip('@').lstrip('!').strip()
+    response=""
+    if(has_mora(str(message.author.id),amount) and message.author.id!=int(target)):
+      send_mora(str(message.author.id),target,amount)
+      response = "The transaction has been done successfully"
+    else:
+      response = "Something went wrong you either don't have enough money or your transaction information is not correct"
+    await message.channel.send(response)
+  elif message.content.startswith('!lottery '):
+    ticket = message.content.split(' ',1)[1].strip()
+    if(int(ticket)>20):
+      await message.channel.send("The lottery ticket number should be between 1:20")
+      return
+    if(has_mora(str(message.author.id),50)):
+      lottery = open('lottery.txt','r')
+      for l in lottery:
+         if(l.startswith(str(message.author.id))):
+           await message.channel.send("You have already bought a lottery ticket you cannot buy more than a one")
+           lottery.close()
+           return
+      send_mora(str(message.author.id),'810188667342553159',50)
+    else:
+      await message.channel.send("You do not have enough money to buy a lottery ticket")
+      return
+    lottery = open('lottery.txt','a')
+    lottery.write(str(message.author.id)+":"+ticket+os.linesep)
+    lottery.close()
+    await message.channel.send("You have bought a lottery ticket successfully good luck!")
+  elif message.content.startswith('!hot '):
+    info = message.content.split(' ')
+    source = str(message.author.id)
+    target = info[1].rstrip('>').lstrip('<').lstrip('@').lstrip('!').strip()
+    if not (info[2].isnumeric() ):
+      await message.channel.send("Please use a valid value for your bet")
+      return
+    value = info[2]
+    await message.channel.send(info[1]+" Choose Head or Tail to accept the challenge if you win you will get $"+value+" "+message.author.mention)
+    def check(ctx):
+      if(str(ctx.author.id)==target):
+        if(ctx.content.lower().strip()=="head"):
+          return 1
+        elif ctx.content.lower().strip()=="tail":
+          return 0
+    reply= await client.wait_for("message", check=check, timeout=30)
+    answer = random.randint(0,1)
+    temp = await message.channel.send("Tossing the coin..")
+    asyncio.sleep(3)
+    temp.delete()
+    if(answer==0):
+      result = "tail"
+    else:
+       result = "head"
+    if(reply ==answer):
+      result = "it's a "+result+"\n"+info[1]+" has won the game"
+      send_mora(source,target,value)
+    else:
+      result = "it's a "+result+"\n"+message.author.mention+" has won the game"
+      send_mora(target,source,value)
+
+  elif ms.startswith('!'):
+    if ms!=message.content and message.channel.id!=461207618183233557:
+        return
+    try:
+       verify = ' '
+       if ' ' in message.content:
+         verify = message.content.split(' ',1)[1]
+       say = ""
+       if message.channel.id==462841576616361987 and verify!='+':
+          say = ".say "
+       await message.channel.send(say+str(db[ms]))
+    except:
+      print('reporting unexisting entity '+ms)
+    finally:
+      return
+
+@client.event
+async def on_member_join(member):
+    tc = client.get_channel(int(db['wm']))
+    await tc.send('Welcome to our server '+ member.mention)
+@client.event
+async def on_member_remove(member):
+    tc = client.get_channel(int(db['wm']))
+    await tc.send('Bye bye '+member.name+', you will be missed.')    
+keep_alive()
+client.run(os.getenv('TOKEN'))

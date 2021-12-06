@@ -1,0 +1,52 @@
+!calculate *expresion*: Calculate the result of simple mathematical expresions.
+
+!stats *player*: View the stats of an online player in cit
+
+!grouponline *group*: View the list of online players in a specific group
+
+!squadonline *squad*: view the list of online players in a specific squad
+
+!players: : Display how many online players are in cit server
+
+!civilians: Display how many online players are in cit server
+
+!settings : Enable/Disable specific features **this command can only be used by adminstrators**
+
+!spam *N* *message* : Spam a specific message N times
+
+!pingme *name*: Add your name to the !ping-list as an identifier which allows you to be mentioned by others 
+
+!ping-list: Display the list of all registered ping identifiers
+
+!ping *ping-identifier*: Mention a player whose name on the 
+!ping-list.
+
+!time: Show the current time in London.
+
+!say *message*: Makes klee say what you want.
+
+.say *message*: A version of .say for a very specific purpose which works only in the channels which are connected to the game.
+
+!set *color name*: Adjust the message color which is sent by using .say
+
+!kill: Stop klee from working ** this command can only be used by 
+adminstrators **
+
+!curses: Show Detailed information about the diverse type of curses note **curses can only be used by adminstrators **
+!remove-curse *user/all* : use it to lift all the curses on all/specific user **this command can only be used by the holders of Exorcist role**.
+
+!learn *word* *information*: teach klee something new whenever the learnt word is sent with '!' behind it at the beginning of the message it will trigger klee to send the information related to that word
+
+!dictionary: View the list of words which were learnt by klee.
+
+!rolldice *maximu value*: get a random value between 1 and the maximum value
+
+!send2gulag *user* : Send a specific user to the gulag ** this 
+command can only be used by the holders of Gulag Emperor Role**
+
+
+
+
+
+
+

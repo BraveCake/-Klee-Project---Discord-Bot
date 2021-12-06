@@ -1,0 +1,61 @@
+!free *user* : Set free a specific user from the gulag ** this command can only be used by the holders of Gulag Emperor Role also it cannot be used on the users who were not sent by !send2gulag command **
+
+!logs *player_name* *start_date in Y-M-D format*: grab total number of lines sent by a player in the civilian team chat *note the player name is case insenstivie*
+
+!logs+ *player_name* *start_date in Y-M-D format*: case senstivie version of !logs command
+
+!lines *player name* *start_date*: grab detailed info about total lines sent by a specific player in the civilian team chat *note the player name case insenstivie*
+
+!lines+ *player name* *start_date in Year-month-day format*: case senstivie version of 
+!lines command
+
+!give-role *user* *role-name* : Give a user a certain role (Only adminstrators)
+
+!remove-role *user* *role-name* : Remove a certain role from the user (Only adminstrators)
+
+!rename *user* *new name* : Rename a user use value *none to remove any existing nick (Only adminstrators)
+
+!banTrials : ban all filthy trials
+
+!count *value* : make klee count from 1 to the specified value
+
+!rgb2hex r g b : convert rgb to hex
+
+!hex2rgb hex: convert hex to rgb
+
+!stimer minutes message(optional): Set a timer
+
+!convert *youtube-link*: converts a youtube video to mp3, you have to open the generated link to pick the most suitable quality.
+
+!updates :view the most recent ig updates
+
+!marry @user :to propose to someone
+
+!partner  : displays the name of the person that you're married to
+
+!divorce  : divorce your partner
+
+!balance : View how much money you have in your mora accont
+
+!daily : Use it daily to get some money in your mora account
+
+!rich : View how much money the other users have
+
+!sm @user amount: Send a specific amount of money to another user
+
+!lottery Ticket_number_between_1 & 20: Buy a ticket to participate at the lottery the ticket costs 50$ you can only buy a single one daily the prize of the lottery is 50k.
+
+!hot @user amount: Challenge someone in coin flipping, it's basically a gambling.
+
+!learn+ word info : Teach Klee something which will be sent by klee when this word is mentioned by any user note this command has influence only on SO-ingame channel
+
+!kmute @user : Prevents the mentioned user from sending any message in the channel which the command was used in. **Note this command can only used by adminstrators, HSO role users or AHSO role users**
+
+!translate text : Translates the text of any language to English, the detection of the text language is done automatically so you don't have to worry about that, notice the translation is not accuarte by 100% but it works!
+
+!kunmute @user: Reverts the effect of the previous command.
+
+!unwarn @user : removes all warning points of a user.
+__ Most Recent updates __
+**-- Optimized Klee's Performance --**
+**-- Temporarily disabled !dictionary to fix some issues --**
