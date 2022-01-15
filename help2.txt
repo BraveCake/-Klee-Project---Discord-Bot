@@ -1,4 +1,4 @@
-!free *user* : Set free a specific user from the gulag ** this command can only be used by the holders of Gulag Emperor Role also it cannot be used on the users who were not sent by !send2gulag command **
+x!free *user* : Set free a specific user from the gulag ** this command can only be used by the holders of Gulag Emperor Role also it cannot be used on the users who were not sent by !send2gulag command **
 
 !logs *player_name* *start_date in Y-M-D format*: grab total number of lines sent by a player in the civilian team chat *note the player name is case insenstivie*
 
@@ -47,11 +47,13 @@
 
 !hot @user amount: Challenge someone in coin flipping, it's basically a gambling.
 
+!length text : Shows the amount of characters & words in the given text.
+
 !learn+ word info : Teach Klee something which will be sent by klee when this word is mentioned by any user note this command has influence only on SO-ingame channel
 
 !kmute @user : Prevents the mentioned user from sending any message in the channel which the command was used in. **Note this command can only used by adminstrators, HSO role users or AHSO role users**
 
-!translate text : Translates the text of any language to English, the detection of the text language is done automatically so you don't have to worry about that, notice the translation is not accuarte by 100% but it works!
+!translate *langauge code* text : Translates the text of any language to English, the detection of the text language is done automatically so you don't have to worry about that, notice the translation is not accuarte by 100% but it works! if no language code is given *en* is the default one important note language code should be preceded and followed by the special character * 
 
 !kunmute @user: Reverts the effect of the previous command.
 

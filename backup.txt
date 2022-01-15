@@ -1,8 +1,9 @@
 import discord
 import os
 from keep_alive import keep_alive
-from threading import Thread
 import random
+import translators as ts
+import sys
 import json
 from bs4 import BeautifulSoup
 import re
@@ -14,49 +15,96 @@ from time import sleep
 from replit import db
 import pytz 
 import requests
-import urllib3
-kw = ["spam","ping","team-ping","wm","anonymous","status",'apps_notifier']
+kw = ["spam","ping","team-ping","wm","anonymous","status",'apps_notifier','team-auto']
 intents = discord.Intents.default()
 intents.members = True
+def ping(name):
+  if(name=='disabled'):
+    return '1'
+  for profile in db.keys():
+    if profile.startswith('(*'):
+      profile_info = eval(db[profile])
+      if(profile_info['PingName']==name):
+        return '<@!'+profile.lstrip('(*')+'>'
+  return '0'
+def players_info(details):
+  response = requests.get("http://jarno.pro/stuff/api/ab.php")
+  if details:
+   return response.json()['RESULTS']
+  else:
+    return response.json()['COUNT_RESULTS']
+@tasks.loop(minutes=5.0)
+async def update_join_quit():
+  players =set()
+  for player in  players_info(True) :
+    players.add(player['name'])
+  online = players.difference(set(db['!players']))
+  offline=  set(db['!players']).difference(players)
+  if len(online) >50 or len(offline)>50:
+     return
+  db['!players']=str(players)
+  channel =  client.get_channel(917108934664409150)
+  await channel.send(str(online)+' **joined**\n'+str(offline)+'**quit**')
+  db['!players'] = str(players)
+async def dynamic_roster(reaction,user):
+  if(reaction.message.author==client.user and reaction.message.embeds[0].title=='Roster' and user!=client.user):
+    result = reaction.message.embeds[0]
+    if reaction.emoji=='➡️':
+          result.description = so_roster[1]
+          so_roster.append(so_roster.pop(0))
+          await reaction.message.edit(embed=result)
+    elif  reaction.emoji=='⬅️':
+          result.description = so_roster[len(so_roster)-1]
+          so_roster.insert(0,so_roster.pop())
+          await reaction.message.edit(embed=result)
+
+
+async def dynamic_help(reaction,user):
+    if(reaction.message.author==client.user and reaction.message.embeds[0].title=='List of commands' and user!=client.user):
+     result = reaction.message.embeds[0]
+     with open('help2.txt','r') as h2:
+      with open('help.txt','r') as h1:
+        if reaction.emoji=='➡️':
+          result.description = h2.read() 
+          await reaction.message.edit(embed=result)
+        elif  reaction.emoji=='⬅️':
+          result.description = h1.read() 
+          await reaction.message.edit(embed=result)
+async def team_chat_mute(message): 
+   await message.channel.set_permissions(message.author, read_messages=True,send_messages=False)
+   await client.get_channel(812678973037215754).send(message.author.mention+" attempted a forbidden action in "+message.channel.name)        
+def create_profile(ctx,id):
+  target_obj = ctx.guild.get_member(int(id))
+  if(target_obj is None ):
+     return False
+  db['(*'+str(id)]= '{"Balance":0,"PingName":"","IG-name":"(Required for team chat access)","daily":"","Warns":0}'
+  print('stored'+str(id))
+  return True
+def get_id(tag):
+  return tag.lstrip('<').rstrip('>').lstrip('@').lstrip('!').strip()
 def get_complete_hash(user,passwrd,session):
   return hex_sha1(bytes(hex_sha1(user.encode("utf-8").lower()+passwrd.encode("utf-8")),'utf-8')+bytes(session,'utf-8'))
 def has_mora(source,amount):
-  coins = open('coins.txt','r')
-  amount = int(amount)
-  for l in coins:
-    l = l.split(':',2)
-    if(l[0]==source):
-      if(int(l[1])>=amount):
-        coins.close()
-        return True
-      else:
-        coins.close()
-        return False
-  coins.close()
-  return False
+    amount = int(amount)
+    source = int(eval (db['(*'+str(source)]) ['Balance'])
+    if(source>=amount):
+          return True
+    else:
+          return False
 def send_mora(source,target,amount):
   amount = int(amount)
-  coins = open('coins.txt','r')
-  content = ''
-  for l in coins:
-      ol = l.split(':',2)
-      if(ol[0]==source):
-        source = ol
-      elif(ol[0]==target):
-        target = ol
-      else:
-        content = content +l
-  coins.close()
-  coins = open('coins.txt','w')
-  coins.write(content)
-  print(source)
-  print(target)
-  if(not isinstance(target,list)):
-    target = [target,'0','0\n']
-  if(source!='000'): #system
-   coins.write(source[0]+':'+str(int(source[1])-amount)+':'+source[2])
-  coins.write(target[0]+':'+str(int(target[1])+amount)+':'+target[2])
-  coins.close()
+  o_source = None
+  if not source == '000':
+   o_source = eval(db['(*'+source])
+  o_target = eval(db['(*'+target])
+  if(not source =='000' and o_source['Balance']<amount):
+    return False
+  o_target['Balance']= o_target['Balance']+amount
+  if not source == '000':
+   o_source['Balance'] = o_source['Balance']-amount
+  if not source == '000':
+   db['(*'+source]= str(o_source)
+  db['(*'+target]= str(o_target)
   return True
 
 def hex_sha1(value):
@@ -68,20 +116,61 @@ def get_authenticity_token(html):
         print('could not find `authenticity_token` on login form')
     result = [token[2].get('name'),token[2].get('value')]
     return result
+def online_stats(target):
+    stats=''
+    players = players_info(True)
+    for player in players:
+     if(player['name'].find(target)!=-1 or  player['name'].lower().find(target.lower())!=-1 ):
+       stats = "Occupation:"+str(player['occupation'])+"\nCash: "+str(player['cash'])+'$\nPlaytime: '+str(int(player['playtime'])/60)+'H\nGroup: '+str(player['gang'])+'\nSquad: '+str(player['squad'])+"\nCountry: "+str(player['country'])+' :flag_'+str(player['country']).lower()+':'+"\nPing: "+str(player['ping'])
+       c = str(player['color']).replace('[','').replace(']','').replace("'","").split(',',3)
+       c = rgb_to_hex(int(c[0]),int(c[1]),int(c[2]))
+       return (discord.Embed(title=str(player['name']), description=stats, color=int("0x"+c,16)) if len(stats)>0 else '' )
+@tasks.loop(minutes=5.0)
+async def notify_me():
+  for target in db.keys(): #check from subscriptions
+    notified=0
+    if(target.startswith(' (')):
+      if(db[target].find('*,')!=-1): #if target was online n= 1
+        notified = 1
+      stats = online_stats(target.lstrip(' (')) #gets stats
+      if not stats : # if not online
+        if(notified): #check if he was set as online before
+          db[target] = db[target].replace('*,','') #set as not online
+          notified = -1
+        else: #move to the next one
+         continue
+      if (notified ==1):
+        continue
+      subscribers = db[target].split(',') #get list of subscribers
+      for subscriber in subscribers: #notify each one
+        if(len(subscriber)<3):
+          continue
+        subscriber =await client.fetch_user(subscriber)
+        await subscriber.send("*"+ target.lstrip('( ') +"* Is {}  ".format("Online" if notified ==0 else "Offline"),embed=stats)
+      if(not notified):
+       db[target] = db[target]+'*,'
+
+@tasks.loop(hours=24.0)
+async def reset_warns():
+  for x in db.keys():
+    if x.startswith('(*'):
+      profile = eval(db[x])
+      profile['Warns']=0
+      db[x]= str(profile)
 @tasks.loop(minutes=60.0)
 async def lottery():
      if(os.path.getsize("lottery.txt")==0):
        return
      lottery = open('lottery.txt','r')
-     winner = str(random.randint(1,20))
+     winner = str(random.randint(1,10))
      response= "Ticket "+str(winner)+" is the lucky one of this lottery!"
      for l in lottery:
        l= l.split(':')
-       if(l[1].lstrip()==winner):
+       if(l[1].rstrip()==winner):
          winner = l
          break
      if(isinstance(winner,list)):
-         response = response+os.linesep+ await client.fetch_user(winner[0])
+         response = response+os.linesep+ (await client.fetch_user(winner[0])).mention
          send_mora('000',winner[0],'50000')
      else:
         response = response + os.linesep+"Unfortunately none was able to win it!!"
@@ -241,12 +330,18 @@ async def modifyRole(ctx,id,role,controller):
    else:
      await target.remove_roles(role)
     
-        
+def unwarn(target):
+   profile = eval(db['(*'+str(target)])
+   profile['Warns']=0
+   db['(*'+str(target)] = str(profile)        
 
 @client.event
 async def on_ready():
     get_updates.start()
     lottery.start()
+    notify_me.start()
+    update_join_quit.start()
+    reset_warns.start()
     print('we have logged in as {0.user}'.format(client))
     if(db['status']!='default'):
       await client.change_presence(activity=discord.Game(name=db['status']))
@@ -256,9 +351,9 @@ o=''
 limiter = False
 @client.event
 async def on_message(message):
-  print(message.content)
+  print(message.content+" ஜ:"+str(message.author.id))
   dashboard=  'so-klee'   #dashboard = name of the channel in which you can have highest acces to klee
-  global cs,m,sev,limiter,kw
+  global cs,m,sev,limiter,kw,so_roster
   ch= await cursed(message) 
   if ch > 0 and message.channel.id!=815610398039867402: #dashboard
     return 
@@ -272,9 +367,12 @@ async def on_message(message):
   AHSO_R = discord.utils.get(message.guild.roles, name = "Assistant Head State Official")
   HSO_R = discord.utils.get(message.guild.roles, name = "Head State Official")
   HSO_R = discord.utils.get(message.guild.roles, name = "Head State Official")
-  TSO_R= discord.utils.get(message.guild.roles, name = "Trial State Official")
+  TSO_R= discord.utils.get(message.guild.roles, id = 452369116611739650)
   emperor = discord.utils.get(message.guild.roles, name="Gulag Emperor") 
+  empress = discord.utils.get(message.guild.roles, name="Gulag Empress")
   prisoner_R = discord.utils.get(message.guild.roles, name="Gulag Prisoner")#Server Role Objects
+  HON_R = discord.utils.get(message.guild.roles, name="Honorable State Official")
+  SO_Roles = [SO_R,AHSO_R,TSO_R,HSO_R,HON_R]
   if(cs==1):
     cs=0
     if not message.content.startswith('There are '):
@@ -283,8 +381,13 @@ async def on_message(message):
 
     
     return
+  def is_head(message):
+   if(not HSO_R in message.author.roles and not AHSO_R in message.author.roles):
+    if not message.author.guild_permissions.administrator :
+      return False
+   return True
   response = requests.get("http://jarno.pro/stuff/api/ab.php")
-  players = response.json()['RESULTS']
+  players = players_info(True)
   if(message.content.lower()=='klee'):
     await message.channel.send(' Ta-da! Klee is here!')
   ms= message.content
@@ -398,8 +501,17 @@ async def on_message(message):
      os.remove(t+' '+date_str+'.txt')
      c=0
     limiter = False
-  elif(message.content.startswith('.say')):
+  elif(message.content.startswith('.say ')):
     if(message.channel.id == 462841576616361987) : #team-chat
+      await message.channel.send('You have received a one warning point for using .say command here once your points exceed 2 you will lose your access to this channel the warning points are reset daily but the access cannot be reteived without intervention' )
+      await client.get_channel(812678973037215754).send(message.author.mention+" attempted a forbidden action in "+message.channel.name)
+      profile = eval(db['(*'+str(message.author.id)]) 
+      if(profile['Warns']>=2):
+        await team_chat_mute(message)
+        return
+      profile['Warns']=profile['Warns']+1
+      db['(*'+str(message.author.id)] = str(profile)
+
       return
     if(message.channel.id!=461207618183233557): #so-ingame
       await message.channel.send("You don't have permission to use this command") 
@@ -445,10 +557,10 @@ async def on_message(message):
     author = ' ('+str(message.author)+')'
     if(db['anonymous']!='false'):
       author = ''
-    await message.channel.send(".say #FFCA33"+str(message.author)+" : #FFFFFF "+m)
+    await message.channel.send(".say #ffa500"+str(message.author)+" : #c5f9f4 "+m)
 
-  if (message.content.startswith('!rolldice')):
-    await message.channel.send(rollDice(message.content))
+  if (ms.startswith('!rolldice')):
+    await message.channel.send(rollDice(ms))
   if (message.content.startswith('!raisemf')):
         await message.channel.send("https://cdn.discordapp.com/attachments/810279347251839026/810286648171429938/81614871ee87f58b9c92813992e7824d_3927207100981871021.png")
   elif (message.content.startswith('!fire1')):
@@ -460,10 +572,10 @@ async def on_message(message):
   elif( message.content.startswith('!khelp')):
     helpf= open('help.txt','r')
     helpl = discord.Embed(title="List of commands", description=helpf.read(), color=int("0x"+"FFD700",16))
-    await message.channel.send( embed =helpl)
-    helpf= open('help2.txt','r')
-    helpl = discord.Embed(title="List of commands page 2", description=helpf.read(), color=int("0x"+"FFD700",16))
-    await message.channel.send( embed =helpl)
+    helpf.close()
+    o_msg = await message.channel.send( embed =helpl)
+    await o_msg.add_reaction('⬅️')
+    await o_msg.add_reaction('➡️')
   elif message.content.startswith("!calculate"):
     await message.channel.send(calculate(message.content))
   elif message.content.startswith('!activate'):
@@ -473,19 +585,12 @@ async def on_message(message):
   elif message.content.startswith('!money2'):
         await message.channel.send('https://cdn.discordapp.com/attachments/589805576171552769/812157150523949066/unknown.png')
   elif message.content.startswith('!stats'):
-    target = message.content.split(' ',2)[1]
-    response = requests.get("http://jarno.pro/stuff/api/ab.php")
-    players = response.json()['RESULTS']
-    for player in players:
-     if(player['name'].find(target)!=-1 or  player['name'].lower().find(target.lower())!=-1 ):
-       target = "Occupation:"+str(player['occupation'])+"\nCash: "+str(player['cash'])+'$\nPlaytime: '+str(int(player['playtime'])/60)+'H\nGroup: '+str(player['gang'])+'\nSquad: '+str(player['squad'])+"\nCountry: "+str(player['country'])+"\nPing: "+str(player['ping'])
-       c = str(player['color']).replace('[','').replace(']','').replace("'","").split(',',3)
-       c = rgb_to_hex(int(c[0]),int(c[1]),int(c[2]))
-       print(c)
-       color = discord.Embed(title=str(player['name']), description=target, color=int("0x"+c,16))
-       await message.channel.send( embed =color)
-       return
-    await message.channel.send("Target not found") 
+       stats = online_stats(message.content.split(' ',1)[1])
+       print(stats)
+       if stats:
+         await message.channel.send( embed =stats) 
+       else:
+         await message.channel.send("Target not found") 
   elif message.content.startswith('!grouponline'):
     target = message.content.split(' ',2)[1]
     result =''
@@ -499,7 +604,12 @@ async def on_message(message):
     if(result==''):
       await message.channel.send("Target not found")
     else:
-     await message.channel.send(target+' has '+str(count)+" online player(s) : "+result)
+     color = discord.Embed(title=target, description=target+' has '+str(count)+" online player(s) : "+result+"\n", color=int("0x"+"D800EE",16))
+     temp= 'https://cit.gg/mike/online/roster.php?group='+target
+     color.set_image(url=temp)
+     color.set_thumbnail(url='https://cit.gg/mike/online/whoisonlinemap.php?group='+target)   #image in icon_url
+
+     await message.channel.send(embed=color)
   elif message.content.startswith('!squadonline'):
     target = message.content.split(' ',2)[1]
     result =''
@@ -513,14 +623,35 @@ async def on_message(message):
     if(result==''):
       await message.channel.send("Target not found")
     else:
-     await message.channel.send(target+' has '+str(count)+" online player(s) : "+result)
+     color = discord.Embed(title=target, description=target+' has '+str(count)+" online player(s) : "+result+"\n", color=int("0x"+"D800EE",16))
+     temp = 'https://cit.gg/mike/online/roster.php?squad='+target
+     color.set_image(url=temp)
+     color.set_thumbnail(url='https://cit.gg/mike/online/whoisonlinemap.php?squad='+target) 
+     await message.channel.send(embed=color)
+  elif message.content.startswith('!unwarn'):
+    if(is_head(message)):
+     target = get_id(message.content.split(' ',1)[1])
+     unwarn(target)
+   
   elif ms== ('!players'):
-    if (int(response.json()['COUNT_RESULTS'])==1):
-          await message.channel.send("There are "+'1'+" online player(s) in game")
+    if (players_info(False)==1):
+          await message.channel.send("There are "+'0'+" online player(s) in game")
     else:
-      await message.channel.send("There are "+str(int (response.json()['COUNT_RESULTS']))+" online player(s) in game")
+      await message.channel.send("There are "+str(players_info(False))+" online player(s) in game")
+  elif ms =='!criminals':
+    count =0
+    for x in players:
+     if(x['team']=='Criminals'):
+        count = count+1
+    await message.channel.send("There are "+str(count)+" online criminal player(s) in game")   
+  elif ms =='!law':
+    count =0
+    for x in players:
+     if(x['team']=='Police Service'):
+        count = count+1
+    await message.channel.send("There are "+str(count)+" online law player(s) in game")   
   elif ms =='!civilians':
-    count =0;
+    count =0
     for x in players:
       if(x['team']=='Unoccupied'):
         count = count+1
@@ -528,33 +659,50 @@ async def on_message(message):
   elif ms =='!board':
     await message.channel.send('https://cit.gg/index.php?board=471.0')
   elif message.content.startswith('!set '):
-    value = message.content.split(' ',2)[1].lower()
+    ovalue = message.content.split(' ',2)[1].lower()
     color = {"blue":"#0000FF","green":"#008000","yellow":"#ffff00","red":"#FF0000","white":"#FFFFFF","black":"#000000","pink":"#ffc0cb","purple":"#8f2eff","rainbow":"special"}
-    value = color[value]
-    if( value is None):
-      sev=''
-      await message.channel.send('please use a valid color name')
-      return
+    try :
+       value = color[ovalue]
+    except KeyError:
+        value = None
+    if value is None:
+      if not ovalue.startswith('#'):
+        sev=''
+        await message.channel.send('please use a valid color name')
+        return
+      else:
+        value=ovalue
     await message.channel.send('color has been set successfully to '+message.content.split(' ',2)[1].lower())
     sev=value
-  elif message.content.startswith('!kill'):
+  elif message.content==('!kill'):
     if message.channel.name!=dashboard:
        return
     else :
-     await client.logout()
+     await  client.close()
+  elif message.content=='!restart':
+    if message.channel.name!=dashboard:
+      return
+    else :
+      os.execv(sys.executable, ['python'] + sys.argv)
   elif message.content =='!klee':
    await message.channel.send('https://cdn.discordapp.com/attachments/815610760205565952/817041086190977064/ezgif-2-49a8333fb4f2.gif')
-  elif ms.startswith('!time '):
+  elif ms.startswith('!time'):
     await message.channel.send(getCitTime())
   elif message.content.startswith('!dictionary'):
-    keys=''
-    for value in db:
-     if(value in kw):
-        continue
-     keys = keys+"\n"+value
-    await message.channel.send(keys)
+   # keys=''
+   #for value in db:
+    # if(value in kw or value.startswith('(*')):
+     #   continue
+    # keys = keys+"\n"+value
+    await message.channel.send("Temporarily Disabled")
+  elif message.content.startswith('!learn+'):
+    key= message.content.split(' ',2)
+    if(key[1] in kw or key[1].startswith('!')):
+      return
+    db['~'+key[1]+'~']= key[2]
+    await message.add_reaction('✅')
   elif ms.startswith('!learn '):
-    if ms!=message.content:
+    if ms.startswith('(*'):
         return
     key=''
     value=''
@@ -568,16 +716,16 @@ async def on_message(message):
       return
     if(key==''):
        return
-    if((key=='inactive'or key=='roster') and not HSO_R  in message.author.roles and not AHSO_R in message.author.roles) and message.channel.name !=dashboard:
-      return
     db[key]=value
     await message.add_reaction('✅')
     return
-  elif message.content.startswith('!forget '):
+  elif message.content.startswith('!forget'):
     if(message.channel.name!=dashboard):
       return
     try:
      key = '!'+message.content.split(' ')[1]
+     if(message.content.startswith('!forget+')):
+       key = '~'+key+'~'
      del db[key]
     finally:
        await message.add_reaction('✅')
@@ -592,7 +740,7 @@ async def on_message(message):
   elif message.content.startswith('!send2gulag'):
     if(emperor not in message.author.roles ):
       return
-    target = message.content.split(' ',1)[1].lstrip('<').rstrip('>').rstrip('@').rstrip('!').strip()
+    target = get_id(message.content.split(' ',2)[1])
     target =  message.guild.get_member(int(target))
     await target.add_roles(prisoner_R)
     gulag = open('gulag.txt','a')
@@ -627,13 +775,79 @@ async def on_message(message):
          gulag.write('+')
        gulag.write('AHSO')
        rs= rs+1
+     if(HSO_R in target.roles):
+       await target.remove_roles(HSO_R)
+       if(rs>0):
+         gulag.write('+')
+       gulag.write('HSO')
+       rs= rs+1
+     if(HON_R in target.roles):
+       await target.remove_roles(HON_R)
+       if(rs>0):
+         gulag.write('+')
+       gulag.write('HON')
+       rs= rs+1       
      gulag.write(os.linesep)
-     await target.send('Welcome to the gulag')
+     if not message.content.endswith('x'):
+       await target.send('Welcome to the gulag')
     except:
        print('gulag exception')
     finally:
          gulag.close()
+  elif message.content.startswith('!profile'):
+    target = id = None
+    note = '\n\n For setting up IG-name use !set-ig <name>\nUse !set-ping <name> to set or change the name which will be used to mention you whether ig or discord you can also disable it by using !set-ig disabled if you find it annoying to be mentioned\n '
+    if(message.content=='!profile'):
+      target = message.author
+      id  = message.author.id
+    else:
+      id = get_id(message.content.split(' ',1)[1])
+      target = message.guild.get_member(int(id))
+    try:
+      db['(*'+str(id)]
+    except:
+      if not create_profile(message,id):
+        await message.channel.send('There\'s no such user')
+        print('here:'+str(id))
+    des=''
+    info = eval( db['(*'+str(id)])
+    for key in info :
+      if key =='daily':
+        continue
+      des = des+key+':'+str(info[key])+'\n'
 
+
+    result = discord.Embed(title= target.name, description =des+note,color=0)
+    result.set_thumbnail(url=target.avatar_url)
+    await message.channel.send(embed=result)
+    
+
+  elif message.content.startswith('!set-ping'):
+    name = message.content.split(' ',1)[1]
+    if ping(name)!='0' :
+      await message.channel.send('There\'s a user has that ping name already')
+      return
+    try:
+      db['(*'+str(message.author.id)] 
+    except:
+      create_profile(message,message.author.id)
+    info = db['(*'+str(message.author.id)] 
+    info =  eval(info)
+    info['PingName']=name
+    db['(*'+str(message.author.id)]   = str(info)
+    await message.add_reaction('✅')
+  elif message.content.startswith('!set-ig'):
+    name = message.content.split(' ',1)[1]
+    if len(name)>20 or re.search("#[A-Fa-f0-9]{6}| [^\0-͡͡͡] |\w+\.[A-Za-z]+",name):
+      await message.channel.send("Please use a proper name")
+      return
+    if  '(*'+str(message.author.id) not in db.keys():
+      create_profile(message,message.author.id)
+    info = db['(*'+str(message.author.id)] 
+    info =  eval(info)
+    info['IG-name']=name
+    db['(*'+str(message.author.id)]   = str(info)
+    await message.add_reaction('✅')
   elif message.content.startswith('!rgb2hex'):
     rgb = message.content.split(' ')
     trgb= rgb[1]+' '+rgb[2]+' '+rgb[3]
@@ -654,14 +868,7 @@ async def on_message(message):
       if(db["spam"]=="false"):
          return
       await message.channel.send(word+l)
-  elif message.content.startswith('!pingme'):
-   ping = open("ping.txt",'a+')
-   target = message.content.split(' ',2)
-   ping.write(target[1]+":"+message.author.mention+os.linesep)
-   ping.close()
-   await message.channel.send('added successfully to @ping-list')
   elif ms.startswith('!ping '):
-    print(ms)
     if(db["ping"]=="false"):
       return
     if(message.channel.id==462841576616361987 and db['team-ping']=='false'): 
@@ -670,38 +877,34 @@ async def on_message(message):
     target=''
     try:
      target = ms.split(' ',2)[1]
+     if target== 'disabled' :
+       return
     except:
      return
-    ping = open("ping.txt","r")
-    for t in ping:
-     user = t.split(':',1);
-     if(user[0]==target):
-       await message.channel.send(user[1])
-       ping.close()
-       return
-    ping.close()
-  elif message.content =='!ping-list':
-    ping = open('ping.txt','r')
-    output = ''
-    for l in ping:
-      p = l.split(':')
-      member = await client.fetch_user(p[1].replace('<','').replace('>','').replace('@','').replace('!','')) #fuckin too lazy to import re for using regex
-      output = output+p[0]+':'+member.name+'\n'
-    await message.channel.send(output)
-    ping.close()
-  elif message.content.startswith('!free'):
-    if(not emperor in message.author.roles)and message. author.id!= 279803864033787905:
+    target = ping(target)
+    if(not target =='0'):
+      await message.channel.send(target)
       return
-    target =  message.content.split(' ',1)[1].lstrip('<').rstrip('>').rstrip('@').rstrip('!').strip()
+  elif message.content.startswith('!free'):
+    if(not emperor in message.author.roles)and message. author.id!= 279803864033787905 and not empress in message.author.roles:
+      return
+    target =  get_id(message.content.split(' ',1)[1])
     gulag = open('gulag.txt','r')
     output= ''
-    user =  message.guild.get_member(int(target))
-    await user.remove_roles(prisoner_R)
+    user = ''
+    if(target!='all'):
+     user =  message.guild.get_member(int(target))
+     await user.remove_roles(prisoner_R)
     for prisoner in gulag:
-      if(prisoner.split(':')[0]==target):
+      pid=prisoner.split(':')[0]
+      if(pid==target or target== 'all'):
         roles = prisoner.split(':')[1].split('+')
-        print(target)
-        print (user.name)
+        if(target=='all'):
+          user =  message.guild.get_member(int(pid))
+          if(prisoner_R in user.roles):
+           await user.remove_roles(prisoner_R)
+          else:
+            continue
         for r in roles:
           r=r.rstrip(os.linesep)
           if(r=='AHSO'):
@@ -714,6 +917,11 @@ async def on_message(message):
             await user.add_roles(guest_R)
           if(r=='EXSO'):
             await user.add_roles(EXSO_R)
+          if(r=='HSO'):
+            await user.add_roles(HSO_R)
+          if (r=="HON"):
+            await user.add_roles(HON_R)
+
       else : 
         output= output+prisoner
     gulag.close()
@@ -829,7 +1037,7 @@ async def on_message(message):
          await asyncio.sleep(3.4)
      await message.channel.send("counting is over!")
   elif message.content.startswith('!give-role') or message.content.startswith('!remove-role'):
-   if(not(HSO_R in message.author.roles) and not (AHSO_R in message.author.roles ) and not message.author.guild_permissions.administrator ):
+   if not is_head(message):
       return
    targetNrole = message.content.split(' ',2)
    if(targetNrole[2]=='Head State Official' and not (HSO_R in message.author.roles) and not message.author.guild_permissions.administrator):
@@ -839,10 +1047,14 @@ async def on_message(message):
    else:
       await modifyRole(message,targetNrole[1],targetNrole[2],0)
   elif message.content.startswith('!rename'):
+    if not is_head(message):
+      return
     info = message.content.split(' ',2)
     info[1]= info[1].replace('>','').replace('<','').replace('!','').replace('@','')
     target =  message.guild.get_member(int(info[1]))
-    await target.edit(nick= info[2])
+    if info[2].lower()=='*none':
+      info[2]=None
+    await target.edit(nick=info[2] )
   elif ms.startswith('!convert'):
     id = message.content.split('?v=')[1]
     await message.channel.send("https://www.yt-download.org/public/api/button/mp3/"+str(id))
@@ -883,8 +1095,17 @@ async def on_message(message):
         content = content+ str(l).strip('\'').strip('b').strip("'").strip('"').strip('<br />')+'\n'
         d=d+1
     await message.channel.send('>>> '+content)
+ # elif message.content == '!update_profiles':
+ #   for profile in db.keys():
+  #    if(profile.startswith('(*')):
+     #   t=  eval(db[profile])
+      #  del t['warns']
+      #  db[profile]=str(t)
+       # state = db[profile].split(',')
+       # state= state[len(state)-1]
+       # if not (state.startswith('warn')): db[profile]= db[profile].rstrip('}')+ ',"warns":0}' 
   elif message.content.startswith('!marry'):
-   target = int(message.content.split(' ')[1].lstrip('<').rstrip('>').lstrip('@').lstrip('!'))
+   target = int(get_id(message.content.split(' ')[1]))
    if(target==810188667342553159):
      await message.channel.send('You cannot marry me you truly baka <a:bongo:747346875426013245>')
      return
@@ -900,7 +1121,6 @@ async def on_message(message):
    def check(ctx):
       if(ctx.author.id ==target and ctx.content.lower()=='yes'):
         return True
-    
    await message.channel.send(message.author.mention+" would like to marry you "+message.content.split(' ')[1]+" say yes if you are willing to spend your entire life with him/her")
    reply =''
    try:
@@ -1000,87 +1220,87 @@ async def on_message(message):
     soup = BeautifulSoup(res,"html.parser")
     mydiv = soup.find("div", {"class": "windowbg"})
     fr = open('froster.txt','w')
-    fr.write(mydiv.get_text(separator='\n').split('Quote',1)[1].strip())
+    fr.write(mydiv.get_text(separator='\n').strip())
     fr.close()
     fr = open('froster.txt','r')
+    so_roster = ("Head State Official"+fr.read().split('Head State Official',1)[1].split('Changes',1)[0]).split('˟')
+    fr.seek(0) #read() moves the locaiton pointer to EOF apparently discord uses the pointer while uploading the file content so nothing is being sent
     await message.channel.send(file=discord.File(fr))
+    r = discord.Embed(title="Roster", description=so_roster[0], color=int("0x"+"E67E22",16))
+    o_msg = await message.channel.send( embed =r)
+    await o_msg.add_reaction('⬅️')
+    await o_msg.add_reaction('➡️')
     fr.close()
   #elif message.content=='!02!':
    #db['apps_notifier']='true'
   elif message.content=='!daily':
-    coins = open('coins.txt','r')
-    content = ''
-    value= random.randint(150,300)
-    ovalue = value
-    current_date = datetime.now().strftime("%d-%m-%y")
-    for l in coins:
-      ol= l.split(':',2)
-      if(ol[0]==str(message.author.id)):
-        
-        print(str(current_date).strip()==ol[2].strip())
-        if(current_date==ol[2].strip()):
-          await message.channel.send("You've already received your daily cash today stop being greedy!")
-          return
-        value = value + int(ol[1])
-      else:
-        content = content+l
-    await message.channel.send('>>> '+str(ovalue)+"$ has been added to your mora account \n"+"your current balance is "+str(value)+"$ now")
-    coins.close()
-    coins = open('coins.txt','w')
-    content= content+str(message.author.id)+':'+str(value)+":"+current_date+os.linesep
-    coins.write(content)
-    coins.close()
+      try:
+        db['(*'+str(message.author.id)]
+      except:
+        create_profile(message,message.author.id)
+      value= random.randint(150,300)
+      current_date = datetime.now().strftime("%d-%m-%y")
+      profile = eval (db['(*'+str(message.author.id)])
+      if(profile['daily']==current_date):
+            await message.channel.send("You've already received your daily cash today stop being greedy!")
+            return
+      else: 
+        profile['Balance'] = value + int(profile['Balance'])
+        profile['daily']=current_date
+        db['(*'+str(message.author.id)]=str(profile)
+      await message.channel.send('>>> '+str(value)+"$ has been added to your mora account \n"+"your current balance is "+str(profile['Balance'])+"$ now")
   elif message.content=='!balance' or message.content =='!bal':
-    coins = open('coins.txt','r')
-    for l in coins:
-      if(l.startswith(str(message.author.id))):
-        await message.channel.send('>>> Your current balance is $'+l.split(':',2)[1])
-        coins.close()
-        return
-    await message.channel.send ("what a poor ass you don't even have a mora account")
-    coins.close()
+    try:
+     db['(*'+str(message.author.id)]
+    except: 
+      create_profile(message,message.author)
+    bal = eval(db['(*'+str(message.author.id)])['Balance']
+    await message.channel.send('>>> Your current balance is $'+str(bal))
+    
   elif message.content=='!rich':
         sorted_dic = {}
-        coins = open('coins.txt','r')
-        for l in coins:
-          v= l.split(":",2)
-          if(not (int(v[1]) in sorted_dic)):
-           user = message.guild.get_member(int(v[0]))
-           if(user is not None):
-             sorted_dic[int(v[1])] = [user.name]
-          else:
-            sorted_dic[int(v[1])].append(message.guild.get_member(int(v[0])).name)
+        for l in db.keys():
+            if l.startswith('(*') :
+              
+             user = eval(db[l])
+             l=int( l.lstrip("(*" ))
+             if user['Balance'] in sorted_dic:
 
+               sorted_dic[user['Balance']].append(message.guild.get_member(l ).name)
+             else:
+                 sorted_dic[user['Balance']] = [message.guild.get_member(l ).name]
+        print(sorted_dic)
         content=''
         for x in sorted(sorted_dic,reverse=True):
           content =content+str(sorted_dic[x]).lstrip('[').rstrip(']').replace('\'','')+' : '+str(x)+'\n'+" "
         await message.channel.send(">>> ★"+content)
-        coins.close()
         return
   elif message.content.startswith('!sm '):
     info = message.content.split(' ')
     amount = info[2]
-    target = info[1].rstrip('>').lstrip('<').lstrip('@').lstrip('!').strip()
+    target = get_id(info[1])
     response=""
-    if(has_mora(str(message.author.id),amount) and message.author.id!=int(target)):
-      send_mora(str(message.author.id),target,amount)
-      response = "The transaction has been done successfully"
+    if(message.author.id!=int(target)):
+      if not send_mora(str(message.author.id),target,amount):
+       response = "You don't have enought money to complete this transaction."
+      else: 
+       response = "The transaction has been done successfully"
     else:
-      response = "Something went wrong you either don't have enough money or your transaction information is not correct"
+      response = "Something went wrong your transaction information is not correct"
     await message.channel.send(response)
   elif message.content.startswith('!lottery '):
     ticket = message.content.split(' ',1)[1].strip()
-    if(int(ticket)>20):
-      await message.channel.send("The lottery ticket number should be between 1:20")
+    if(int(ticket)>10):
+      await message.channel.send("The lottery ticket number should be between 1:10")
       return
-    if(has_mora(str(message.author.id),50)):
+    if(send_mora(str(message.author.id),'810188667342553159',50)):
       lottery = open('lottery.txt','r')
       for l in lottery:
          if(l.startswith(str(message.author.id))):
            await message.channel.send("You have already bought a lottery ticket you cannot buy more than a one")
+           send_mora('810188667342553159',str(message.author.id),50)
            lottery.close()
            return
-      send_mora(str(message.author.id),'810188667342553159',50)
     else:
       await message.channel.send("You do not have enough money to buy a lottery ticket")
       return
@@ -1088,36 +1308,97 @@ async def on_message(message):
     lottery.write(str(message.author.id)+":"+ticket+os.linesep)
     lottery.close()
     await message.channel.send("You have bought a lottery ticket successfully good luck!")
-  elif message.content.startswith('!hot '):
+  elif message.content.startswith('!hot'):
     info = message.content.split(' ')
     source = str(message.author.id)
-    target = info[1].rstrip('>').lstrip('<').lstrip('@').lstrip('!').strip()
+    target = get_id(info[1])
     if not (info[2].isnumeric() ):
       await message.channel.send("Please use a valid value for your bet")
       return
+    if(source == target):
+      await message.channel.send("You cannot challenge yourself, stupido ")
+      return
+    if not has_mora(source,info[2]) :
+      await message.channel.send('You do not have enough money to do this challenge')
+      return
+    elif not has_mora(target,info[2]):
+      await message.channel.send('Your opponent doesn\'t have enough mora to do this challenge')
+      return
     value = info[2]
-    await message.channel.send(info[1]+" Choose Head or Tail to accept the challenge if you win you will get $"+value+" "+message.author.mention)
+    await message.channel.send(info[1]+" Choose Head or Tail to accept the challenge if you win you will get $"+value+" from "+message.author.mention)
+    rep_ly = " "
     def check(ctx):
+      if message.author.id == ctx.author.id:
+        return
+      nonlocal rep_ly
       if(str(ctx.author.id)==target):
         if(ctx.content.lower().strip()=="head"):
-          return 1
-        elif ctx.content.lower().strip()=="tail":
-          return 0
-    reply= await client.wait_for("message", check=check, timeout=30)
-    answer = random.randint(0,1)
+          rep_ly= "head"
+          return True
+        elif (ctx.content.lower().strip()=="tail"):
+          rep_ly = "tail"
+          return True
+    try:
+     reply= await client.wait_for("message", check=check, timeout=60)
+    except:
+      message.add_reaction('❌')
+    answer = random.randint(1,2)
     temp = await message.channel.send("Tossing the coin..")
-    asyncio.sleep(3)
-    temp.delete()
-    if(answer==0):
-      result = "tail"
+    await asyncio.sleep(3)
+    await temp.delete()
+    print('the reply is '+str(reply)+" result ="+str(answer))
+    if(answer==1):
+      answer = "head"
     else:
-       result = "head"
-    if(reply ==answer):
-      result = "it's a "+result+"\n"+info[1]+" has won the game"
+      answer= "tail"
+    if(message.content.startswith('!hot.')):
+      rep_ly=''
+    if(rep_ly ==answer):
+      result = "it's a "+answer+"\n"+info[1]+" has won the game"
       send_mora(source,target,value)
     else:
-      result = "it's a "+result+"\n"+message.author.mention+" has won the game"
+      result = "it's a "+answer+"\n"+message.author.mention+" has won the game"
       send_mora(target,source,value)
+    await message.channel.send(result)
+  elif message.content.startswith('!kmute'):
+    if not is_head(message):
+      return
+    target = message.guild.get_member(int(get_id(message.content.split(' ',1)[1])))
+    await message.channel.set_permissions(target,send_messages=False)
+  elif message.content.startswith('!kunmute'):
+    if not is_head(message):
+      return
+    target = message.guild.get_member(int(get_id(message.content.split(' ',1)[1])))
+    await message.channel.set_permissions(target,overwrite=None)
+  elif message.channel.id== 461207618183233557 and '~'+ms+'~' in db.keys():
+    await message.channel.send(db['~'+ms+'~'])
+  elif ms.startswith('!translate'):
+    tsrc = ms.split(' ',1)[1]
+    await message.channel.send(ts.google(tsrc))
+  elif message.content.startswith('!notify'):
+    targets= message.content.split(' ',1)[1].split(',')
+    ss = 'Subscribed Successfully, you will be notified in your dm if the target(s) online'
+    for target in targets:
+      target = target.strip()
+      if (' ('+target) in db.keys():
+       if str(message.author.id) not in  db[' ('+target].split(','):
+         db[' ('+target]=db[' ('+target]+','+ str(message.author.id)
+       else:
+         ss = 'You cannot subscribe to the nofication of a user you\'re already subscribed too!'
+         break
+      else:
+        db[' ('+target]= str(message.author.id)+','
+    await message.channel.send(ss)
+  elif message.content.startswith('!unnotify'):
+    targets= message.content.split(' ',1)[1].split(',')
+    ss = 'target not found'
+    for target in targets:
+      target = target.strip()
+      if (' ('+target) in db.keys():
+        db[' ('+target]=db[' ('+target].replace(str(message.author.id)+',','')
+        ss = "You have removed your subscription successfully"
+    await message.channel.send(ss)
+
 
   elif ms.startswith('!'):
     if ms!=message.content and message.channel.id!=461207618183233557:
@@ -1134,6 +1415,42 @@ async def on_message(message):
       print('reporting unexisting entity '+ms)
     finally:
       return
+  elif message.channel.id ==462841576616361987 and message.author.id != 463528533143060491 and db['team-auto']!='false' and message.author.id !=403112358630916096: #team-say, not the bot/webhook and the option enabled
+    author=message.author.id
+    profile = None
+    try:
+     profile = eval(db['(*'+str(author)])
+     if(profile['IG-name']=='(Required for team chat access)'):
+       raise Exception
+    except:
+      await message.channel.send("Please confirm your ig-name to access this feature you can confirm it via !set-ig <name> ")
+      return
+
+    if(len(profile['IG-name'])<3):
+      return
+    if(message.content.startswith('.') ):
+      return
+    if( re.search("#[A-Fa-f0-9]{6}| [^\0-͡͡͡] |\w+\.[A-Za-z]+",message.content) or profile['Warns']>=2):
+      await team_chat_mute(message)
+      return
+    if(db['anonymous']!='false'):
+      author = ''
+    rank = '#ffffff'
+    for r in SO_Roles:
+     if( r in message.author.roles):
+       rank='#ffa500'
+       break
+    await message.channel.send(".say "+rank+profile['IG-name']+" : #c5f9f4 "+message.content)
+    sleep(3.3)
+@client.event
+async def on_reaction_add(reaction,user):
+  await dynamic_help(reaction,user)
+  await dynamic_roster(reaction,user)
+@client.event
+async def on_reaction_remove(reaction,user):
+  await dynamic_help(reaction,user)
+  await dynamic_roster(reaction,user)
+
 
 @client.event
 async def on_member_join(member):
