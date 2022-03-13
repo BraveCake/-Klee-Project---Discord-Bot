@@ -330,6 +330,14 @@ docs = ["sphinx (>=1.6.5)", "sphinx-rtd-theme"]
 tests = ["pytest (>=3.2.1,!=3.3.0)", "hypothesis (>=3.27.0)"]
 
 [[package]]
+name = "pytube"
+version = "12.0.0"
+description = "Python 3 library for downloading YouTube Videos."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[[package]]
 name = "pytz"
 version = "2021.1"
 description = "World timezone definitions, modern and historical"
@@ -459,7 +467,7 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "61de03c22899a0f42bf502d5808d81d25b4afe12e73b68735acc9673222966a5"
+content-hash = "1f620ef04e006c5e229861b22615e0652e6eff45f5e65298b26fe9bc4d340761"
 
 [metadata.files]
 aiohttp = [
@@ -833,6 +841,10 @@ pynacl = [
     {file = "PyNaCl-1.4.0-cp38-cp38-win32.whl", hash = "sha256:9c4a7ea4fb81536c1b1f5cc44d54a296f96ae78c1ebd2311bd0b60be45a48d96"},
     {file = "PyNaCl-1.4.0-cp38-cp38-win_amd64.whl", hash = "sha256:7c6092102219f59ff29788860ccb021e80fffd953920c4a8653889c029b2d420"},
     {file = "PyNaCl-1.4.0.tar.gz", hash = "sha256:54e9a2c849c742006516ad56a88f5c74bf2ce92c9f67435187c3c5953b346505"},
+]
+pytube = [
+    {file = "pytube-12.0.0-py3-none-any.whl", hash = "sha256:e6cb158ab16f747eae490a5f49233ddb1f111a425c014fb8a9cda7fcb806a689"},
+    {file = "pytube-12.0.0.tar.gz", hash = "sha256:422a9c2e1d35521f00c692b59c18edbaf2c1e12197bd36745bf00a26875674db"},
 ]
 pytz = [
     {file = "pytz-2021.1-py2.py3-none-any.whl", hash = "sha256:eb10ce3e7736052ed3623d49975ce333bcd712c7bb19a58b9e2089d4057d0798"},

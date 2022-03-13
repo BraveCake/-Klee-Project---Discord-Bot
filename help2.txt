@@ -9,6 +9,8 @@ x!free *user* : Set free a specific user from the gulag ** this command can only
 !lines+ *player name* *start_date in Year-month-day format*: case senstivie version of 
 !lines command
 
+!cancel : cancels the ongoing process of logs gathering
+
 !give-role *user* *role-name* : Give a user a certain role (Only adminstrators)
 
 !remove-role *user* *role-name* : Remove a certain role from the user (Only adminstrators)
@@ -58,6 +60,10 @@ x!free *user* : Set free a specific user from the gulag ** this command can only
 !kunmute @user: Reverts the effect of the previous command.
 
 !unwarn @user : removes all warning points of a user.
+
+!write text : special command introduces you to some of klee's hidden talents
+
+!average : shows the average amount of messages sent in teamchat today
 __ Most Recent updates __
 **-- Optimized Klee's Performance --**
-**-- Temporarily disabled !dictionary to fix some issues --**
+**-- Added !write command --**

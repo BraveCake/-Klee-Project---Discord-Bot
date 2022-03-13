@@ -1,142 +1,188 @@
+
+
+
+
+
+
+
+
+[Acid]Azot
+
+
+
+
+
+
+Junior Community Member
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Posts: 81
+Registered: 19/04/2019
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Ingame: Azot
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[PENDING] State Official Application - Azot.
+
+
+
+
+« 
+ on:
+ 
+Today
+ at 09:47:03 pm »
+
+
+
+
+
+
+
+
+Quote
+
+
+
+
+
+
+
+
 State Official Application
 Personalia
- 
 Country of residence
-: Israel
+: Russia
 GMT
-: GMT +2
+: +3
 Your Age
-: 20
+: 17
 Do you attend school / What's your occupation
-: I'm currently in college
+: At the moment I am studying to be a welder and an electrician.
 About yourself (150 words min.)
-: My name is Basel, I live in Israel in a small town where I lived all of my life up to this point. Life has always been pretty much the same as every other kid, I went to the same school most of my life with the same group of people, I was not the type of person that got along very well with everyone but I managed. All my life I was fascinated by technology and its pros and cons to humanity I was always the kind of kid who would spend his time on the computer trying to figure out how it works which got me into a lot of trouble when I picked open like 3 PCs, all in all, this fascination set me on a path to try to learn coding where I spent most of my school days getting better at math so I can major in Computer Science (I was told I needed very high marks for Compute Science), after 3 years of hard work and 1 year into my high school phase, I majored in Computer Science and from there the years passed where I was for the first time enjoying school and the story just goes on from there. After I graduated from high school, I wanted to pursue the same thing but there we so many options so many different kinds of computer science, so I combined my love of data and my love of coding to study data system engineering and I applied for the most suitable college that I could found. In the meantime, I tried to work a year which didn't go that well because of the coronavirus, I was rendered unemployed and unable to receive a paycheck from the government because I was under 20 years old (a crappy system I know), so I was able to find some online work where I sold shoes and clothes for a percentage of all the sales that I had made, which surprisingly got me through those times when the country was in lockdown. Fast forward to the start of October, I began my first year and the first semester which was very hard since I was unable to focus in my home environment but I passed the first semester and I hope I pass the second semester too.
+:I would like to start with my age of course. I am 17 years old, I am studying at a technical school. At the moment I have only the first year. I'll be doing my internship soon. I also work at various jobs to help my family. My name is Mikhail. I was engaged in various sports, I will list some: swimming and athletics. I am the deputy head of the student council at the technical school. I study a lot of additional information about my profession, as I want to get a good discharge after practice. In my free time I play CIT, for a civilian. At the moment I have been working as a guide on the server for about half a year.
 Account Details
 In-game Nick-Name with group / squad tags
-: xC|DeathWish
-In-game Nick-Name without tags
-: DeathWish
+: AC|Azot|Eagle
 In-game Account Name
  
-(CaSe sensitive)
-: lolmaker
+(Case sensitive)
+: mishapid
 Serial (F8 > serial):
- B16BB381983B819E0597A441A7F8AB12
+FF0D92B31B481D9C952B65F46C2D4984
 Screenshot of your /stats (
 imgur
  or 
 pilo.ovh
  links only)
-: 
-https://imgur.com/lTqal6B
+:https://imgur.com/gallery/SyPxnRW
 Screenshot of your civilian jobs ranks (
 imgur
  or 
 pilo.ovh
  links only)
-: 
-https://imgur.com/vjKp3LT
+:https://imgur.com/gallery/SyPxnRW
 Screenshot of /myhistory (
 imgur
  or 
 pilo.ovh
  links only)
-:https://imgur.com/LT7uJqb
-I have played CIT since the year
-: 2014
+:https://imgur.com/gallery/LyKOxVD [I deleted the whole story when I reinstalled the game. I had a problem with the files.]
 Community Engagement
 List up groups you have formerly been a part of, as well as the reason for leaving them and what rank you ended up as
-:
-What would you do to make CIT a better place
-: I have been in many groups I may not remember them all correctly
-SWATTeam
-FBI
-KLM
-Ti
-SAPD
-HoBoS
-FFH
-Pirus
-TSF
-CID
-All of these I was a trial and left in a matter of a week/two weeks with reasons of hopping between groups
-Terrorists - Trusted - Group got deleted
-Born2Win - Co-Founder - Changed to the civilian side
-5thStreetSaints Priest (I could be wrong I don't remember correctly) - Left to open a new group with my friends
-Sl4ppers - Leader -  Group went inactive
-TeamRuver - Leader - Group went Inactive
-Ineffables - Ineffable - Group resigned
-Those are all that I remember
+:1337-no active, pZ-no active,mC- no active,5th-no active,MSS-no active,Pirus-dead, TR-left, ATR-dead, Rv-dead,Groves-dead,Vagos-dead,FFH-leave,B13-leave,SMM-no active,CzN-no active,DoM-no active, Lion-no active. 1ty-no active,c1-no active,Purge-no active,A*-no active. At the moment I am a member of Avidacompany and I will stay here forever. Since I will continue my game as a civilian.
 Have you had any suggestions that ended up being implemented into the game? If yes, list them here (possibly with link)
-: Not currently but many things I suggested got re-suggested by others and got accepted 
-What side do you spend your most time on? Civilian, Law or Criminal
-: Civilian
-What group are you currently a part of, and what is your rank?
-: xCode - Assassin 
+: - Merged KZ (Kazakhstan) country chat with RU, BY and UA. (Arran + Azot)
 What is your relation to the civilian side?
-: I have been an active civilian ever since I made a return to this server where I have actively tried to work on ways to improve the civilian experience working closely with other experienced civilians.
+: I treat civilians very well. If there were no workers, then criminals and gangsters would be without resources.
 What makes you a State Official / why should you be accepted?
-:  I'm gonna go out and say that yes I don't meet all of the job requirements but my addition is much more than just stats, I had basically L0 in every job and ever since I came back I have spent my time getting to know every job inside out and know how every job works by experimenting myself or asking my fellow civilians so yes I may not have the stats but be assured that I have the experience to guide and help players with jobs and even the most experienced players may learn a new trick or two from me. Now, what makes me a state official/why would I be accepted? I'm a very nice and understanding person who's hardworking and willing to work 110% more than anyone to prove my place in between others. In addition, I can assure every single SO that you'll gain a trustworthy life long friend who is willing to help anyone in the time of need no matter what it takes, if you have an issue you can count on me to have your back with it, also I can lighten the mood with my pretty lame jokes so yea. Besides all of that, I will uphold the guidelines and I will never abuse any access that has been given to me and I'll give it my best to perform my duties, which entails taking care of the civilian side and make sure all the jobs are balanced, bug-free and make sure no player without good knowledge would be able to make drastic changes to the side. Also, other duties that I have been to keep my fellow citizens entertained as civilians and guide/help anyone who asks for assistance no matter what it is.
+: I am a very obedient and adequate player. I stay out of trouble so that there are no problems. I really like playing with civilian players and talking to them. I will do an event with good prizes every day. I also help my country a lot, I am ready to do work for foreign guys. I love foreign guys. And we are preparing to devote a lot of time.
 Civilian Experience
 How often do you usually spend time as civilian?
-: 90-95% of my time
-What is your favorite civilian job? (Name + Level)
-: Pilot L8
-What is your highest level in a civilian job? (Name + Level)
-: Lumberjack L10
-What are your 5 best civilian jobs? (Names + Levels)
-: Lumberjack L10 - Pilot L8 - Iron Miner L8 - Bus Driver L5 - Farmer L5
+:I recently switched sides with civilians. I'll stay here forever.
 Which job(s) have you never worked with / worked with the least?
-: Hunter, I barely worked the job
-Your weaknesses, as well as skills: 
-(In-Game not real life)
-Weakness
-  1) LS combat system
-  2) Landing a plane
-  3) Flying a plane like a normal person
-Skills
-  1) I'm very good with an NRG
-  2) Fighting skills in LV is excellent
+: Courier, Reporter, Hunter, Pizza Delivery Man, City Engineer, Street Cleaner.
 Psychological Questions
 If someone asks you to host a chase event with them in their vehicle but keeps leaving his vehicle and causes the event to stop. What would you do if he asks for one more?
-: I would deny his request, Obviously his intentions were to troll and if his intentions were otherwise, I can't risk having him cancel another event.
+:I will tell him to place it in my car to avoid stopping the event.
 Describe when you are to hide a vehicle and what proofs you would get in case they complain
-:According to the guidelines I have to have a screenshot so, I'll have multiple screenshots and in rare cases, if screenshots don't show the full picture a video of the incident that led me to hide their vehicle
+: first I warn him, then I'll take a screenshot if he doesn't listen to me, then I'll hide the car.
 There is an active Criminal Boss online. And there's no Staff or Police Chief's online. Then a player starts complaining that someone is blocking the entrance to an Armed Robbery with his vehicle. What will you do?
-: Well, first I would contact the Criminal Boss about the situation and ask him to kindly handle it. If there isn't a response, I will check the situation myself and see if the car is really blocking the entrance, if it is blocking I'll have to take sufficient evidence and remove it 
+: I will contact the Crime Boss and ask him to deal with this player, as this is a criminal activity and I have nothing to do with it except to tell the online crime boss.
 A farmer found his way out of the farm with a farming job vehicle and is driving away from the farm, what will you do?
-: I'll message the player to hide his vehicle, If he refuses, then I'll take sufficient evidence and hide it. 
-I will also help him get him where he wanted to get so he doesn't get left in the middle of nowhere.
-Any other vehicle from the farmer job is okay to drive around
+:I will tell him to hide the car and offer him a ride to the place where he wants to go, if he refuses my offer and does not hide the car, I will first take a screenshot and then hide the car.
 Someone is using his freshly tuned racing car and gives the Firefighters a visit by driving around the fire zone and crashing into barrels, what will you do?
-: If someone went to drive around firefighters and crash into barrels; he is either trolling or a new player, in both cases I will try to talk with the player and ask him to not disturb the area at least until the firefighters have finished, if he proceeds with what he is doing, I will take the necessary proofs, hide his vehicle and explain to him what he did wrong and why it's wrong. An additional step for a new player is to guide him a bit around the server and teach him the rules or find a guider who speaks his language to help him.
+:I will very well ask him not to do this, because firefighters are working here, and you are interfering with them, if he does not listen to my words, I will take a screenshot and hide his car.
 Someone is using his Andromada to disturb civilians from entering using the Mod Shop from the airport, what will you do?
-: if it is clearly blocking the Mod Shop and he is clearly trolling players, I will warn him and tell him to hide his plane. If he ignores me, I will take screenshots and hide plane by myself
+:First of all, I'll ask him to kindly hide his andromeda, if he doesn't, I'll contact an employee to deal with him. If there are no employees online, I'll take a screenshot and hide his car in case he files a complaint.
 You are driving around the roads of Los Santos and see a lost pilot who landed his Dodo on the road, what will you do?
-:I will talk with him and ask if any help is needed, then I will repair his Dodo if it's neded, so he will be able to continue his work. But if he landed just to block the road, I will kindly tell him to fly away, or I will be forced to hide his Dodo. Before hiding plane I will take screenshots as evidence.
+:I'll ask him well to hide the plane and offer to give him a ride to the airport to start the mission again, in case he doesn't listen to me, I'll take a screenshot and hide his plane.
 You suddenly meet your best friend in LS who has 5 stars and is running from a police officer, you are able to hide the police officer's car to help your friend, what do you do?
-: I will do nothing, I'm not authorized to help him by using my powers I'm only allowed to help him if I go /criminal and fight with him
+:I wouldn't help my friend in this case, even if he's my brother, I won't do it, I'll be away from him and the cop's car, so I won't distribute the officer while working.
 Disclaimer
 I understand if I reply to my application or contact SO 
-(you can contact HSO or AHSO if something important needs to be shared)
+(you can contact any regular SO if something important needs to be shared)
  about their vote my application will be denied
-: Yes
+: Yes. I understand this rule well.
 I will abide by all CIT server rules as well as the SO Guidelines
-: Yes
+:Yes
 I will only use the click vehicle recovery script to hide blocking and empty vehicles in the farm, and major misconducting cases outside of the farm
 : Yes
 I will not troll people with my new powers
-: Yes
+: Never
 I will change my name and talk with [SO] tags in the Civilian Workers chat to confuse people
-: No, I won't
+: I won't do that.
 I haven't read the application guidelines and regulations
-: I did read them
+:Nope, I've read all the guidelines and regulations.
 I will use my new powers to have some fun with my friends
-: If I'm having fun by hosting events then yes I will use them but I won't use them to abuse in any way or hide my friend's vehicles for fun
+: Nope I won't.
 I acknowledge that my account is my responsibility and that if I encourage any abuse or any abuse is coming from my account, I will be banned from playing the CIT server
-: Yes
-Note: I know I have been inactive but if I'm fully back now and trying my best to engage in the community I also proved to be very valuable in the past and I will continue to prove so 
-Note: I copied parts from my older application since I wasn't denied for a lack of effort 
+:Yes, I agree.
 
 
 
@@ -149,5 +195,20 @@ Note: I copied parts from my older application since I wasn't denied for a lack 
 « 
 Last Edit: 
 Today
- at 09:54:16 pm by Slash
+ at 09:48:27 pm by Cerberus
  »
+
+
+
+
+
+
+
+Logged
+
+
+
+
+
+
+
