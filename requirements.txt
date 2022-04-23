@@ -5,4 +5,7 @@ bs4
 pytz
 pytube
 urllib3
+Flask
 firebase-admin
+Pillow
+requsts
