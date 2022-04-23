@@ -1353,9 +1353,10 @@ async def on_message(message):
         await target.edit(nick=info[2])
     elif ms.startswith('!convert'):
         url = message.content.split(' ',1)[1] 
-        temp_file=pytube.YouTube(url).streams.filter(only_audio=True).first().download(filename='d.mp3')
+        temp_file=pytube.YouTube(url).streams.filter(only_audio=True).first().download()
         msg = await discord.utils.get(client.get_all_channels(), id=947925896256434257).send(file=discord.File(temp_file))
         await message.channel.send(msg.attachments[0].url)
+        os.remove(temp_file)
       
     elif message.content.startswith('!sing'):
         client.disconent
