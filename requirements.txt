@@ -7,4 +7,3 @@ pytube
 urllib3
 flask
 firebase-admin
-requsts
