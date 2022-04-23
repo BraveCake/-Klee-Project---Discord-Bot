@@ -7,3 +7,4 @@ pytube
 urllib3
 flask
 firebase-admin
+Pil
