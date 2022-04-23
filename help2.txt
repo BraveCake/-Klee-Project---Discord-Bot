@@ -65,5 +65,5 @@ x!free *user* : Set free a specific user from the gulag ** this command can only
 
 !average : shows the average amount of messages sent in teamchat today
 __ Most Recent updates __
-**-- Optimized Klee's Performance --**
-**-- Added !write command --**
+**-- Migrated both of klee hosting & database the downtime should be less now --**
+
