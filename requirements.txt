@@ -4,7 +4,7 @@ translators
 bs4
 Pillow
 pytz
-pytube==12.0.0
+pytube
 urllib3
 flask
 firebase-admin
