@@ -23,7 +23,7 @@ Honorable
 
 
 
-Posts: 169
+Posts: 170
 Registered: 08/09/2012
 
 
@@ -101,13 +101,7 @@ State Official
 DeathWish
  
  
-Cerberus 
- 
- 
 Kazoki
- 
- 
-Jaguar
  
  
 Drago
@@ -116,9 +110,6 @@ Drago
 abdall2
  
 xenonso
- 
- 
-CoPe
  
  
 Sawos
@@ -130,10 +121,10 @@ Revo.
 Smart
  
  
-Shinya
- 
- 
 Isdej
+ 
+ 
+Shinya
  
 ˟
 Associate State Official
@@ -143,12 +134,14 @@ Associate State Official
                                                                                                                                                                                
  
 Show content
-SMA - SO Management Access
+SOMA - SO Management Access aka key.
 ● Warned
 ● Semi Inactive
 Inactive State officials list
 Show content
---None currently--
+ 
+CoPe
+ 
 QA/OC- Quality Assurance/Oversight committee: 
 Show content
  
@@ -160,6 +153,37 @@ Burner
 ˟
 Changelog:
 Show content
+Wednesday, April 13, 2022: 
+ 
+Cerberus 
+ has resigned. (Kazoki+ Deathwish) 
+Tuesday, April 12, 2022: 
+ 
+Shinya
+ 
+ Set as active. (DeathWish)
+Thursday, April 5, 2022: 
+ 
+CoPe
+ 
+ Set as inactive. (DeathWish)
+Tuesday, April 5, 2022: 
+ 
+Jaguar
+ has resigned and set as honorable for serving the team for years. (SO team) 
+Sunday, April 3, 2022: Set 
+ 
+Jaguar
+  and 
+ 
+ Shinya
+ 
+ as inactive. (kazoki)
+Friday, April 1, 2022: 
+ 
+Shinya
+ 
+ Has been warned for low activity. (SO Team)
 Sunday, March 7, 2022: Set myself as active again. (DeathWish)
 Sunday, March 7, 2022: 
  
@@ -172,7 +196,7 @@ Kenz
  
 Marky'
  have resigned.
-Friday, March 4, 2022: Removed HSO Rank & Made SO team autonomous. Any decision making/ policy changes will be according to the majority of state officials' votes.  DeathWish, Cerberus and Kazoki were given SMA to act according to the team's decisions. (EX-HSOs - SO Team)
+Friday, March 4, 2022: Removed HSO Rank & Made SO team autonomous. Any decision making/ policy changes will be according to the majority of state officials' votes.  DeathWish, Cerberus and Kazoki were given SOMA/key to act according to the team's decisions. (EX-HSOs - SO Team)
 Friday, March 4, 2022: Promoted 
  
 Sawos
@@ -381,7 +405,9 @@ This
 
 
 « 
-Last Edit: 07 03, 2022, 06:58:49 pm by DeathWish
+Last Edit: 
+Today
+ at 10:18:57 am by Kazoki
  »
 
 

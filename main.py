@@ -12,15 +12,19 @@ from discord.ext import tasks, commands
 import asyncio
 from datetime import datetime,timedelta
 from time import sleep
-from replit import db
+# from replit import db #drepricated replit db is no longer needed
 import pytz
 import requests
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 import pytube
-#db['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
-#db['quick-bot'] = 'true'
+from database import Database
+
+
+fdb = Database()
+#fdb['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
+#fdb['quick-bot'] = 'true'
 kw = [
     "spam", "ping", "team-ping", "wm", "anonymous", "status", 'apps_notifier','statistics',
     'team-auto','teamchat-commands','dashboard','quick-bot'
@@ -46,9 +50,9 @@ async def teamStatistics():
 def ping(name):
     if (name == 'disabled'):
         return '1'
-    for profile in db.keys():
+    for profile in fdb.keys():
         if profile.startswith('(*'):
-            profile_info = eval(db[profile])
+            profile_info = eval(fdb[profile])
             if (profile_info["PingName"] == name):
                 return '<@!' + profile.lstrip('(*') + '>'
     return '0'
@@ -57,7 +61,7 @@ async def post_statistics():
   if not datetime.now().hour==23:
     return
   statistics = await teamStatistics()
-  channel= discord.utils.get(SO_SERVER,name=db['statistics'])
+  channel= discord.utils.get(SO_SERVER,name=fdb['statistics'])
   await channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(datetime.now())+'\nfirst message sent today: '+statistics[2])
   
 def players_info(details): 
@@ -77,12 +81,12 @@ async def update_join_quit():
     players = set()
     for player in players_info(True):
         players.add(player['name'].replace("'", '').replace('"', ''))
-    previous = db['!players'].lstrip('{').rstrip('}').replace(' ', '').replace(
+    previous = fdb['!players'].lstrip('{').rstrip('}').replace(' ', '').replace(
         '"', '').replace("'", '').split(',')
     previous = set(previous)
     online = players.difference(previous)
     offline = previous.difference(players)
-    db['!players'] = str(players)
+    fdb['!players'] = str(players)
     result = ['']
     lines = 0
     index = 0
@@ -155,7 +159,7 @@ def create_profile(ctx, id):
     target_obj = ctx.guild.get_member(int(id))
     if (target_obj is None):
         return False
-    db['(*' + str(
+    fdb['(*' + str(
         id
     )] = '{"Balance":0,"PingName":"","IG-name":"(Required for team chat access)","daily":"","Warns":0}'
     print('stored' + str(id))
@@ -175,7 +179,7 @@ def get_complete_hash(user, passwrd, session):
 
 def has_mora(source, amount):
     amount = int(amount)
-    source = int(eval(db['(*' + str(source)])['Balance'])
+    source = int(eval(fdb['(*' + str(source)])['Balance'])
     if (source >= amount):
         return True
     else:
@@ -186,16 +190,16 @@ def send_mora(source, target, amount):
     amount = int(amount)
     o_source = None
     if not source == '000':
-        o_source = eval(db['(*' + source])
-    o_target = eval(db['(*' + target])
+        o_source = eval(fdb['(*' + source])
+    o_target = eval(fdb['(*' + target])
     if (not source == '000' and o_source['Balance'] < amount):
         return False
     o_target['Balance'] = o_target['Balance'] + amount
     if not source == '000':
         o_source['Balance'] = o_source['Balance'] - amount
     if not source == '000':
-        db['(*' + source] = str(o_source)
-    db['(*' + target] = str(o_target)
+        fdb['(*' + source] = str(o_source)
+    fdb['(*' + target] = str(o_target)
     return True
 
 
@@ -239,22 +243,22 @@ def online_stats(target):
 
 @tasks.loop(minutes=5.0)
 async def notify_me():
-    for target in db.keys():  #check from subscriptions
+    for target in fdb.keys():  #check from subscriptions
         notified = 0
         if (target.startswith(' (')):
-            if (db[target].find('*,') != -1):  #if target was online n= 1
+            if (fdb[target].find('*,') != -1):  #if target was online n= 1
                 notified = 1
             stats = online_stats(target.lstrip(' ('))  #gets stats
             if not stats:  # if not online
                 if (notified):  #check if he was set as online before
-                    db[target] = db[target].replace('*,',
+                    fdb[target] = fdb[target].replace('*,',
                                                     '')  #set as not online
                     notified = -1
                 else:  #move to the next one
                     continue
             if (notified == 1):
                 continue
-            subscribers = db[target].split(',')  #get list of subscribers
+            subscribers = fdb[target].split(',')  #get list of subscribers
             for subscriber in subscribers:  #notify each one
                 if (len(subscriber) < 3):
                     continue
@@ -264,16 +268,16 @@ async def notify_me():
                         "Online" if notified == 0 else "Offline"),
                     embed=stats)
             if (not notified):
-                db[target] = db[target] + '*,'
+                fdb[target] = fdb[target] + '*,'
 
 
 @tasks.loop(hours=24.0)
 async def reset_warns():
-    for x in db.keys():
+    for x in fdb.keys():
         if x.startswith('(*'):
-            profile = eval(db[x])
+            profile = eval(fdb[x])
             profile['Warns'] = 0
-            db[x] = str(profile)
+            fdb[x] = str(profile)
 
 
 @tasks.loop(minutes=60.0)
@@ -325,23 +329,23 @@ async def get_updates():
             content = content + str(l).strip('\'').strip('b').strip("'").strip(
                 '"').strip('<br />') + '\n'
             d = d + 1
-    if (content != db['updates']):
-        db['updates'] = content
+    if (content != fdb['updates']):
+        fdb['updates'] = content
         channel = client.get_channel(860293711228043264) 
         await channel.send(content)
-    if (db['apps_notifier'] != 'off'):
+    if (fdb['apps_notifier'] != 'off'):
         res = connect2forum('https://cit.gg/index.php?board=471.0')
         soup = BeautifulSoup(res, "html.parser")
         element = soup.find("td", {"class": "stats windowbg"})
         current_apps = element.find("p").get_text(separator="*").split('*',
                                                                        1)[1]
                                                                   
-        if (db['__apps__'] != current_apps):
+        if (fdb['apps'] != current_apps):
             so_private =  client.get_channel(934511680388489266)
             await so_private.send(
                 '~Ara ~ ara there is a new applicant <:KleeE:867193529620103179>'
             )
-            db['__apps__'] = current_apps
+            fdb['apps'] = current_apps
             res = connect2forum("https://cit.gg/index.php?board=852.0")
             soup = BeautifulSoup(res, "html.parser")
             element = soup.select('.table_grid tr')[4].findChildren(
@@ -488,9 +492,9 @@ async def modifyRole(ctx, id, role, controller):
 
 
 def unwarn(target):
-    profile = eval(db['(*' + str(target)])
+    profile = eval(fdb['(*' + str(target)])
     profile['Warns'] = 0
-    db['(*' + str(target)] = str(profile)
+    fdb['(*' + str(target)] = str(profile)
 
 
 @client.event
@@ -509,7 +513,7 @@ async def on_ready():
     HON_R = extractRole(460713877517107220)
     SO_Roles = [SO_R, TSO_R, KEY_R, HON_R]
     GULAG_ACL =[KEY_R,emperor,empress]
-    if db['quick-bot']!='off':
+    if fdb['quick-bot']!='off':
       return
     if not get_updates.is_running():
         get_updates.start()
@@ -519,8 +523,8 @@ async def on_ready():
     update_join_quit.start()
     reset_warns.start()
     print('we have logged in as {0.user}'.format(client))
-    if (db['status'] != 'default'):
-        await client.change_presence(activity=discord.Game(name=db['status']))
+    if (fdb['status'] != 'default'):
+        await client.change_presence(activity=discord.Game(name=fdb['status']))
 
 
 sev = '#FFFFFF'
@@ -554,7 +558,7 @@ async def on_message(message):
             and (ms.find('(SO)') != -1 or ms.find('TEAM') != -1)):
         ms = ms.split(':', 2)[1]
     ms = ms.lstrip()
-    if (db['status'] == 'default' and message.content.startswith('There')
+    if (fdb['status'] == 'default' and message.content.startswith('There')
             and message.author.id == 462940393093201921):
         await client.change_presence(activity=discord.Game(
             name="with " + str(message.content.split('**', 2)[1]) +
@@ -580,7 +584,7 @@ async def on_message(message):
                     return
     if (message.content.startswith('!logs')):
         if (message.channel.id != 810279347251839026
-                and message.channel.name != db['dashboard']):  #so-logs
+                and message.channel.name != fdb['dashboard']):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
             return
@@ -622,7 +626,7 @@ async def on_message(message):
         limiter = False
     elif (message.content.startswith('!lines')):
         if (message.channel.id != 810279347251839026
-                and message.channel.name != db['dashboard']):  #so-logs
+                and message.channel.name != fdb['dashboard']):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
             return
@@ -688,12 +692,12 @@ async def on_message(message):
             await client.get_channel(812678973037215754).send(
                 message.author.mention + " attempted a forbidden action in " +
                 message.channel.name)
-            profile = eval(db['(*' + str(message.author.id)])
+            profile = eval(fdb['(*' + str(message.author.id)])
             if (profile['Warns'] >= 2):
                 await team_chat_mute(message)
                 return
             profile['Warns'] = profile['Warns'] + 1
-            db['(*' + str(message.author.id)] = str(profile)
+            fdb['(*' + str(message.author.id)] = str(profile)
 
             return
         if (message.channel.id != 461207618183233557):  #so-ingame
@@ -704,7 +708,7 @@ async def on_message(message):
         await message.delete()
         await asyncio.sleep(3.3)
         author = ' (' + str(message.author) + ')'
-        if db['anonymous'] != 'off':
+        if fdb['anonymous'] != 'off':
             author = ""
         if (sev != 'special'):
             await message.channel.send("#FFCA33" + author + " : " + str(sev) +
@@ -757,7 +761,7 @@ async def on_message(message):
             await message.channel.send(m)
             return
         author = ' (' + str(message.author) + ')'
-        if (db['anonymous'] != 'off'):
+        if (fdb['anonymous'] != 'off'):
             author = ''
         await message.channel.send(".say #ffa500" + str(message.author) +
                                    " : #c5f9f4 " + m)
@@ -888,6 +892,21 @@ async def on_message(message):
                 count = count + 1
         await message.channel.send("There are " + str(count) +
                                    " online civilian player(s) in game")
+    elif message.content == '!country':
+      country_stats= {}
+      for i in players_info(True):
+        if not i['country'] in country_stats:
+          country_stats[i['country']]=0
+        country_stats[i['country']]=country_stats[i['country']]+1
+      details = ''
+      for key,value in country_stats.items():
+        details= details+key+" "+":flag_"+key.lower()+":"+" : "+str(value)+'\n'
+        details = details.replace(':flag_N/A:','') if key=='N/A' else details
+      embed =discord.Embed(title="country stats",
+                              description=details,
+                              color=int("0x" + "FFD700", 16))
+      await message.channel.send(embed=embed)
+        
     elif message.content=='!staff':
       players = players_info(True)
       output=''
@@ -934,13 +953,13 @@ async def on_message(message):
                                    message.content.split(' ', 2)[1].lower())
         sev = value
     elif message.content == ('!kill'):
-        if message.channel.name != db['dashboard']:
+        if message.channel.name != fdb['dashboard']:
             return
         else:
             await client.close()
             await message.add_reaction('✅')
     elif message.content == '!restart':
-        if message.channel.name != db['dashboard']:
+        if message.channel.name != fdb['dashboard']:
             return
         else:
             await message.add_reaction('✅')
@@ -953,7 +972,7 @@ async def on_message(message):
         await message.channel.send(getCitTime())
     elif message.content.startswith('!dictionary'):
       keys=''
-      for key in db:
+      for key in fdb.keys():
          if(key.startswith('!')):
             keys = keys+"\n"+key
       parts = split_message(keys)
@@ -963,7 +982,7 @@ async def on_message(message):
         key = ms.split(' ', 1)[1].split('.',1) if ms.find('.')!=-1 else ms.split(' ',1)[1].split(' ')
         if (key[0] in kw or key[0].startswith('!')):
             return
-        db['~' + key[0] + '~'] = key[1]
+        fdb['~' + key[0] + '~'] = key[1]
         await message.add_reaction('✅')
     elif ms.startswith('!learn '):
         if ms.startswith('(*'):
@@ -980,7 +999,7 @@ async def on_message(message):
             return
         if (key == ''):
             return
-        db[key] = value
+        fdb[key] = value
         await message.add_reaction('✅')
         return
     elif message.content.startswith('!forget'):
@@ -988,16 +1007,16 @@ async def on_message(message):
             key = '!' + message.content.split(' ')[1]
             if (message.content.startswith('!forget+')):
                 key = '~' + key + '~'
-            del db[key]
+            del fdb[key]
         finally:
             await message.add_reaction('✅')
             return
         return
     elif message.content.startswith("!forgetall*"):
-        if (message.channel.name != db['dashboard']):
+        if (message.channel.name != fdb['dashboard']):
             return
-        for key in db:
-            del db[key]
+        for key in fdb.keys():
+            del fdb[key]
         await message.channel.send('done')
     elif message.content.startswith('!send2gulag'):
         roles_and_id_list = message.author.roles
@@ -1057,13 +1076,13 @@ async def on_message(message):
             id = get_id(message.content.split(' ', 1)[1])
             target = message.guild.get_member(int(id))
         try:
-            db['(*' + str(id)]
+            fdb['(*' + str(id)]
         except:
             if not create_profile(message, id):
                 await message.channel.send('There\'s no such user')
                 print('here:' + str(id))
         des = ''
-        info = eval(db['(*' + str(id)])
+        info = eval(fdb['(*' + str(id)])
         for key in info:
             if key == 'daily':
                 continue
@@ -1081,12 +1100,12 @@ async def on_message(message):
             await message.channel.send(
                 'There\'s a user has that ping name already')
             return
-        if ('(*' + str(message.author.id)) not in db.keys():
+        if ('(*' + str(message.author.id)) not in fdb.keys():
             create_profile(message, message.author.id)
-        info = db['(*' + str(message.author.id)]
+        info = fdb['(*' + str(message.author.id)]
         info = eval(info)
         info['PingName'] = name
-        db['(*' + str(message.author.id)] = str(info)
+        fdb['(*' + str(message.author.id)] = str(info)
         await message.add_reaction('✅')
     elif message.content.startswith('!set-ig'):
         name = message.content.split(' ', 1)[1]
@@ -1094,12 +1113,12 @@ async def on_message(message):
                 "#[A-Fa-f0-9]{6}| [^\0-͡͡͡] |\w+\.[A-Za-z]+", name):
             await message.channel.send("Please use a proper name")
             return
-        if '(*' + str(message.author.id) not in db.keys():
+        if '(*' + str(message.author.id) not in fdb.keys():
             create_profile(message, message.author.id)
-        info = db['(*' + str(message.author.id)]
+        info = fdb['(*' + str(message.author.id)]
         info = eval(info)
         info['IG-name'] = name
-        db['(*' + str(message.author.id)] = str(info)
+        fdb['(*' + str(message.author.id)] = str(info)
         await message.add_reaction('✅')
     elif message.content.startswith('!rgb2hex'):
         rgb = message.content.split(' ')
@@ -1110,7 +1129,7 @@ async def on_message(message):
                             color=int("0x" + rgb, 16))
         await message.channel.send(embed=rgb)
     elif message.content.startswith('!spam'):
-        if (db["spam"] == "off"):
+        if (fdb["spam"] == "off"):
             return
         l = " "
         word = message.content.split(' ', 2)[2]
@@ -1120,14 +1139,14 @@ async def on_message(message):
             await message.channel.send('that is too much')
             return
         for x in range(int(times)):
-            if (db["spam"] == "off"):
+            if (fdb["spam"] == "off"):
                 return
             await message.channel.send(word + l)
     elif ms.startswith('!ping '):
-        if (db["ping"] == "off"):
+        if (fdb["ping"] == "off"):
             return
         if (message.channel.id == 462841576616361987
-                and db['team-ping'] == 'off'):
+                and fdb['team-ping'] == 'off'):
             if (ms.content != message.content):
                 return
         target = ''
@@ -1283,13 +1302,13 @@ async def on_message(message):
     elif ms.startswith('!play'):  #Command for MEE6 no need to report it
         return
     elif message.content == '!settings':
-        if message.channel.name != db['dashboard']:
+        if message.channel.name != fdb['dashboard']:
             await message.channel.send(
                 "You do not have permission to use this command")
             return
         listo = ""
         for key in kw:
-            value = str(db[key])
+            value = str(fdb[key])
             listo = listo + key + " : " + value + os.linesep
         info = discord.Embed(title="Bot Settings",
                              description=listo,
@@ -1302,7 +1321,7 @@ async def on_message(message):
         input = message.content.split(' ', 2)
         if (input[1] not in kw):
             return
-        db[input[1]] = input[2]
+        fdb[input[1]] = input[2]
         if (input[1] == 'status'):
             await client.change_presence(activity=discord.Game(
                 name=str(input[2])))
@@ -1383,14 +1402,14 @@ async def on_message(message):
         await message.channel.send('>>> ' + content)
 
 # elif message.content == '!update_profiles':
-#   for profile in db.keys():
+#   for profile in fdb.keys():
 #    if(profile.startswith('(*')):
-#   t=  eval(db[profile])
+#   t=  eval(fdb[profile])
 #  del t['warns']
-#  db[profile]=str(t)
-# state = db[profile].split(',')
+#  fdb[profile]=str(t)
+# state = fdb[profile].split(',')
 # state= state[len(state)-1]
-# if not (state.startswith('warn')): db[profile]= db[profile].rstrip('}')+ ',"warns":0}'
+# if not (state.startswith('warn')): fdb[profile]= fdb[profile].rstrip('}')+ ',"warns":0}'
     elif message.content.startswith('!marry'):
         target = int(get_id(message.content.split(' ')[1]))
         if (target == 810188667342553159):
@@ -1533,6 +1552,12 @@ async def on_message(message):
                       headers=headers,
                       cookies=cookies)
         test.write(res.text)
+    elif message.content == "!err":
+      for key in fdb.keys():
+        if key=='!/' or key.startswith('__'):
+          print("ERROR"+key)
+          continue
+        print(key)
     elif message.content == '!roster':
         res = connect2forum('https://cit.gg/index.php?topic=131282.0')
         test = open('text.txt', 'w')
@@ -1558,15 +1583,15 @@ async def on_message(message):
         await o_msg.add_reaction('➡️')
         fr.close()
     #elif message.content=='!02!':
-    #db['apps_notifier']='true'
+    #fdb['apps_notifier']='true'
     elif message.content == '!daily':
         try:
-            db['(*' + str(message.author.id)]
+            fdb['(*' + str(message.author.id)]
         except:
             create_profile(message, message.author.id)
         value = random.randint(150, 300)
         current_date = datetime.now().strftime("%d-%m-%y")
-        profile = eval(db['(*' + str(message.author.id)])
+        profile = eval(fdb['(*' + str(message.author.id)])
         if (profile['daily'] == current_date):
             await message.channel.send(
                 "You've already received your daily cash today stop being greedy!"
@@ -1575,17 +1600,17 @@ async def on_message(message):
         else:
             profile['Balance'] = value + int(profile['Balance'])
             profile['daily'] = current_date
-            db['(*' + str(message.author.id)] = str(profile)
+            fdb['(*' + str(message.author.id)] = str(profile)
         await message.channel.send('>>> ' + str(value) +
                                    "$ has been added to your mora account \n" +
                                    "your current balance is " +
                                    str(profile['Balance']) + "$ now")
     elif message.content == '!balance' or message.content == '!bal':
         try:
-            db['(*' + str(message.author.id)]
+            fdb['(*' + str(message.author.id)]
         except:
             create_profile(message, message.author)
-        bal = eval(db['(*' + str(message.author.id)])['Balance']
+        bal = eval(fdb['(*' + str(message.author.id)])['Balance']
         await message.channel.send('>>> Your current balance is $' + str(bal))
     elif message.content=='!cancel':
       if (message.channel.id != 810279347251839026):
@@ -1596,10 +1621,10 @@ async def on_message(message):
 
     elif message.content == '!rich':
         sorted_dic = {}
-        for l in db.keys():
+        for l in fdb.keys():
             if l.startswith('(*'):
 
-                user = eval(db[l])
+                user = eval(fdb[l])
                 l = int(l.lstrip("(*"))
                 if user['Balance'] in sorted_dic:
                     value =message.guild.get_member(l)
@@ -1767,9 +1792,9 @@ async def on_message(message):
         target = message.guild.get_member(
             int(get_id(message.content.split(' ', 1)[1])))
         await message.channel.set_permissions(target, overwrite=None)
-    elif message.channel.id == 461207618183233557 and '~' + ms + '~' in db.keys(
+    elif message.channel.id == 461207618183233557 and '~' + ms + '~' in fdb.keys(
     ):
-        await message.channel.send(db['~' + ms + '~'])
+        await message.channel.send(fdb['~' + ms + '~'])
     elif ms.startswith('!translate'):
         tsrc = ms.split(' ', 1)[1]
         tlanguage = 'en'
@@ -1783,23 +1808,23 @@ async def on_message(message):
         ss = 'Subscribed Successfully, you will be notified in your dm if the target(s) online'
         for target in targets:
             target = target.strip()
-            if (' (' + target) in db.keys():
-                if str(message.author.id) not in db[' (' + target].split(','):
-                    db[' (' + target] = db[' (' + target] + ',' + str(
+            if (' (' + target) in fdb.keys():
+                if str(message.author.id) not in fdb[' (' + target].split(','):
+                    fdb[' (' + target] = fdb[' (' + target] + ',' + str(
                         message.author.id)
                 else:
                     ss = 'You cannot subscribe to the nofication of a user you\'re already subscribed too!'
                     break
             else:
-                db[' (' + target] = str(message.author.id) + ','
+                fdb[' (' + target] = str(message.author.id) + ','
         await message.channel.send(ss)
     elif message.content.startswith('!unnotify'):
         targets = message.content.split(' ', 1)[1].split(',')
         ss = 'target not found'
         for target in targets:
             target = target.strip()
-            if (' (' + target) in db.keys():
-                db[' (' + target] = db[' (' + target].replace(
+            if (' (' + target) in fdb.keys():
+                fdb[' (' + target] = fdb[' (' + target].replace(
                     str(message.author.id) + ',', '')
                 ss = "You have removed your subscription successfully"
         await message.channel.send(ss)
@@ -1812,19 +1837,19 @@ async def on_message(message):
             if ' ' in message.content:
                 verify = message.content.split(' ', 1)[1]
             say = ""
-            if message.channel.id == 462841576616361987 and verify != '+' and db['teamchat-commands']:
+            if message.channel.id == 462841576616361987 and verify != '+' and fdb['teamchat-commands']:
                 say = ".say "
-            await message.channel.send(say + str(db[ms]))
+            await message.channel.send(say + str(fdb[ms]))
         except:
             print('reporting unexisting entity ' + ms)
         finally:
             return
-    elif message.channel.id == 462841576616361987 and message.author.id != 463528533143060491 and db[
+    elif message.channel.id == 462841576616361987 and message.author.id != 463528533143060491 and fdb[
             'team-auto'] != 'off' and message.author.id != 403112358630916096:  #team-say, not the bot/webhook and the option enabled
         author = message.author.id
         profile = None
         try:
-            profile = eval(db['(*' + str(author)])
+            profile = eval(fdb['(*' + str(author)])
             if (profile['IG-name'] == '(Required for team chat access)'):
                 raise Exception
         except:
@@ -1842,7 +1867,7 @@ async def on_message(message):
             await team_chat_mute(message)
             return
         async with lock:
-          if (db['anonymous'] != 'off'):
+          if (fdb['anonymous'] != 'off'):
               author = ''
           rank = '#ffffff'
           for r in SO_Roles:
@@ -1868,13 +1893,13 @@ async def on_reaction_remove(reaction, user):
 
 @client.event
 async def on_member_join(member):
-    tc = discord.utils.get(SO_SERVER,name=db['wm'])
+    tc = discord.utils.get(SO_SERVER,name=fdb['wm'])
     await tc.send('Welcome to our server ' + member.mention)
 
 
 @client.event
 async def on_member_remove(member):
-    tc = client.get_channel(int(db['wm']))
+    tc = client.get_channel(int(fdb['wm']))
     await tc.send('Bye bye ' + member.name + ', you will be missed.')
 keep_alive()
 client.run(os.getenv('TOKEN'))
