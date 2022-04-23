@@ -1,0 +1,8 @@
+discord.py
+PyNaCl
+translators
+bs4
+pytz
+pytube
+urllib3
+firebase-admin
