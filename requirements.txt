@@ -4,7 +4,6 @@ translators
 bs4
 Pillow
 pytz
-pytube
 urllib3
 flask
 firebase-admin
