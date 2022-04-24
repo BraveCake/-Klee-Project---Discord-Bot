@@ -583,7 +583,7 @@ async def on_message(message):
                         await asyncio.sleep(1.3)
                     await message.channel.send(temp)
                     return
-    fdb['dashboard'] = dashboard
+    #fdb['dashboard'] = dashboard
     if (message.content.startswith('!logs')):
         if (message.channel.id != 810279347251839026
                 and message.channel.name != fdb['dashboard']):  #so-logs
