@@ -1,5 +1,5 @@
 import psycopg2
-
+import os
 class Database():
   me = None
   def __init__(self):
