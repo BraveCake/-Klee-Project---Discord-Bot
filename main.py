@@ -499,6 +499,7 @@ def unwarn(target):
 
 @client.event
 async def on_ready():
+    fdb['test']= 'passed'
     global SO_SERVER,extractRole,EXSO_R,guest_R,SO_R,TSO_R,emperor,empress,prisoner_R,HON_R,SO_Roles,GULAG_ACL
     SO_SERVER = client.get_guild(451993644644171776)
     extractRole = lambda r_id:           discord.utils.get(SO_SERVER.roles,id=r_id)
