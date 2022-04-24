@@ -340,12 +340,12 @@ async def get_updates():
         current_apps = element.find("p").get_text(separator="*").split('*',
                                                                        1)[1]
                                                                   
-        if (fdb['apps'] != current_apps):
+        if (fdb['__apps__'] != current_apps):
             so_private =  client.get_channel(934511680388489266)
             await so_private.send(
                 '~Ara ~ ara there is a new applicant <:KleeE:867193529620103179>'
             )
-            fdb['apps'] = current_apps
+            fdb['__apps__'] = current_apps
             res = connect2forum("https://cit.gg/index.php?board=852.0")
             soup = BeautifulSoup(res, "html.parser")
             element = soup.select('.table_grid tr')[4].findChildren(
