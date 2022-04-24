@@ -61,7 +61,7 @@ async def post_statistics():
   if not datetime.now().hour==23:
     return
   statistics = await teamStatistics()
-  channel= discord.utils.get(SO_SERVER,name=fdb['statistics'])
+  channel= discord.utils.get(SO_SERVER.channels,name=fdb['statistics'])
   await channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(datetime.now())+'\nfirst message sent today: '+statistics[2])
   
 def players_info(details): 
@@ -1896,13 +1896,13 @@ async def on_reaction_remove(reaction, user):
 
 @client.event
 async def on_member_join(member):
-    tc = discord.utils.get(SO_SERVER,name=fdb['wm'])
+    tc = discord.utils.get(SO_SERVER.channels,name=fdb['wm'])
     await tc.send('Welcome to our server ' + member.mention)
 
 
 @client.event
 async def on_member_remove(member):
-    tc = client.get_channel(int(fdb['wm']))
+    tc = discord.utils.get(SO_SERVER.channels,name=fdb['wm'])
     await tc.send('Bye bye ' + member.name + ', you will be missed.')
 keep_alive()
 client.run(os.getenv('TOKEN'))
