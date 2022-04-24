@@ -11,7 +11,7 @@ class Database():
     self.fdb= Database.me.cursor()
 
   def __getitem__(self, key):
-        return self.fdb.execute("SELECT value FROM main WHERE key=%s",key).fetchone()
+        return self.fdb.execute("SELECT value FROM main WHERE key=%s",(key)).fetchone()
   def __setitem__(self,key,value):
     self.fdb.execute("INSERT INTO main (key,value) VALUES(%s,%s) ON CONFLICT (key) DO UPDATE SET value =%s",(key,value,value))
   def keys(self):
