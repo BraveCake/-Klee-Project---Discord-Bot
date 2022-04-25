@@ -1112,7 +1112,7 @@ async def on_message(message):
             des = des + key + ':' + str(info[key]) + '\n'
 
         result = discord.Embed(title=target.name,
-                               description=des +'\n'+ note,
+                               description=des +'\njoined at:'+str(target.joined_at)+'\n'+ note,
                                color=0)
         result.set_thumbnail(url=target.avatar_url)
         await message.channel.send(embed=result)
