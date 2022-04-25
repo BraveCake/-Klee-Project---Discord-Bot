@@ -1109,10 +1109,10 @@ async def on_message(message):
         for key in info:
             if key == 'daily':
                 continue
-            des = des + key + ':' + str(info[key]) + '\n'+'joined at:'+str(target.joined_at)
+            des = des + key + ':' + str(info[key]) + '\n'
 
         result = discord.Embed(title=target.name,
-                               description=des + note,
+                               description=des +'\n'+ note,
                                color=0)
         result.set_thumbnail(url=target.avatar_url)
         await message.channel.send(embed=result)
