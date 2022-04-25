@@ -983,7 +983,7 @@ async def on_message(message):
         desc = message.guild.description
         embed = discord.Embed(
         title=message.guild.name + " Server Information",
-        description=desc,
+        description="description:"+desc,
         color=int("0x" + "E67E22", 16))
         embed.set_thumbnail(url=icon)
         embed.add_field(name="Owner", value=owner, inline=True)
@@ -1109,7 +1109,7 @@ async def on_message(message):
         for key in info:
             if key == 'daily':
                 continue
-            des = des + key + ':' + str(info[key]) + '\n'+'joined at:'+target.joined_at
+            des = des + key + ':' + str(info[key]) + '\n'+'joined at:'+str(target.joined_at)
 
         result = discord.Embed(title=target.name,
                                description=des + note,
