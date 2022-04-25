@@ -983,7 +983,7 @@ async def on_message(message):
         desc = message.guild.description
         embed = discord.Embed(
         title=message.guild.name + " Server Information",
-        description="description:"+desc,
+        description="description:"+str(desc),
         color=int("0x" + "E67E22", 16))
         embed.set_thumbnail(url=icon)
         embed.add_field(name="Owner", value=owner, inline=True)
