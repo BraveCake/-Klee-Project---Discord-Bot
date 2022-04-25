@@ -954,26 +954,7 @@ async def on_message(message):
         await message.channel.send('color has been set successfully to ' +
                                    message.content.split(' ', 2)[1].lower())
         sev = value
-    elif message.content == '!server':
-        if message.channel.name != fdb['dashboard']:
-            return
-        else:
-    	     owner=str(message.guild.owner)
-   	     region = str(message.guild.region)
-    	     guild_id = str(message.guild.id)
-    	     memberCount = str(message.guild.member_count)
-    	     icon = str(message.guild.icon_url)
-    	     desc=message.guild.description
-             embed = discord.Embed(
-        title=message.guild.name + " Server Information",
-        description=desc,
-        color=int("0x" + "E67E22", 16))
-	     embed.set_thumbnail(url=icon)
-	     embed.add_field(name="Owner", value=owner, inline=True)
-	     embed.add_field(name="Server ID", value=guild_id, inline=True)
-    	     embed.add_field(name="Region", value=region, inline=True)
-    	     embed.add_field(name="Member Count", value=memberCount, inline=True)
-            await message.channel.send(embed=embed)
+
     elif message.content == ('!kill'):
         if message.channel.name != fdb['dashboard']:
             return
@@ -990,6 +971,26 @@ async def on_message(message):
         await message.channel.send(
             'https://cdn.discordapp.com/attachments/815610760205565952/817041086190977064/ezgif-2-49a8333fb4f2.gif'
         )
+    elif message.content == '!server':
+        if message.channel.name != fdb['dashboard']:
+            return
+        else:
+            owner = str(message.guild.owner)
+        region = str(message.guild.region)
+        guild_id = str(message.guild.id)
+        memberCount = str(message.guild.member_count)
+        icon = str(message.guild.icon_url)
+        desc = message.guild.description
+        embed = discord.Embed(
+        title=message.guild.name + " Server Information",
+        description=desc,
+        color=int("0x" + "E67E22", 16))
+        embed.set_thumbnail(url=icon)
+        embed.add_field(name="Owner", value=owner, inline=True)
+        embed.add_field(name="Server ID", value=guild_id, inline=True)
+        embed.add_field(name="Region", value=region, inline=True)
+        embed.add_field(name="Member Count", value=memberCount, inline=True)
+        await message.channel.send(embed=embed)
     elif ms.startswith('!time'):
         await message.channel.send(getCitTime())
     elif message.content.startswith('!dictionary'):
