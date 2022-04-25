@@ -16,4 +16,4 @@ class Database():
     self.fdb.execute("INSERT INTO main (key,value) VALUES(%s,%s) ON CONFLICT (key) DO UPDATE SET value =%s",(key,value,value))
   def keys(self):
     self.fdb.execute('SELECT key FROM main')
-    return self.fdb.fetchall()
+    return [ key[0] for key in self.fdb.fetchall()]
