@@ -751,9 +751,11 @@ async def on_message(message):
       await message.add_reaction('✅')
       statistics = await teamStatistics()
       await message.channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(datetime.now())+'\nfirst message sent today: '+statistics[2])
-          
-          
-              
+    elif message.content.startswith('!vote'):
+        topic = message.content.split(' ',1)[1]
+        vote  = await message.channel.send(topic+'\n  ***by '+message.author.nick+'***')
+        await vote.add_reaction('👎')
+        await vote.add_reaction('👍')
     elif (message.content.startswith('!say ')):
         if (message.channel.id == 461207618183233557):  #so in game
             return
