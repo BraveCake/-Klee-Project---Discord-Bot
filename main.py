@@ -844,7 +844,7 @@ async def on_message(message):
         if(not userNtitle[1].isnumeric()):
             await message.channel.send('please enter a valid user id')
             return
-        ForumTitles.update(userNtitle[2],userNtitle[1])
+        ForumTitles.update(userNtitle[1],userNtitle[2])
         await message.add_reaction('✅')
 
     elif message.content.startswith('!squadonline'):
