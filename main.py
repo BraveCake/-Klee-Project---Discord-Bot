@@ -20,6 +20,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import pytube
 from database import Database
+from forumTitles import ForumTitles
 
 
 fdb = Database()
@@ -838,6 +839,14 @@ async def on_message(message):
                 target)  #image in icon_url
 
             await message.channel.send(embed=color)
+    elif message.content.startswith('!reqtitle'):
+        userNtitle = message.content.split(' ', 2)
+        if(not userNtitle[0].isnumeric()):
+            await message.channel.send('please enter a valid user id')
+            return
+        ForumTitles.update(userNtitle[0],userNtitle[1])
+        await message.add_reaction('✅')
+
     elif message.content.startswith('!squadonline'):
         players = players_info(True)
         target = message.content.split(' ', 2)[1]

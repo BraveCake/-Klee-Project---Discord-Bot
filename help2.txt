@@ -63,6 +63,7 @@ x!free *user* : Set free a specific user from the gulag ** this command can only
 
 !write text : special command introduces you to some of klee's hidden talents
 
+!reqtitle forum_user_id title: modifies/adds you a custom title if you're using our custom forum extension
 !average : shows the average amount of messages sent in teamchat today
 __ Most Recent updates __
 **-- Migrated both of klee hosting & database the downtime should be less now --**
