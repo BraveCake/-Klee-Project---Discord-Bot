@@ -12,11 +12,10 @@ class ForumTitles():
         cred = credentials.Certificate("key.json")
         firebase_admin.initialize_app(cred)
         ForumTitles.me = firestore.client()
-        return ForumTitles.me
     @staticmethod	
     def update(key, value):
         if (not key.isnumeric()):
             return
         if ForumTitles.me==None:
-            ForumTitles.me=ForumTitles()
+            ForumTitles()
         ForumTitles.me.collection(u'users').document(key).set({"title": value})
