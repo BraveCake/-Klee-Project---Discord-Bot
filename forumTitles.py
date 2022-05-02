@@ -13,9 +13,9 @@ class ForumTitles():
         firebase_admin.initialize_app(cred)
         ForumTitles.me = firestore.client()
     @staticmethod	
-    def update(key, value):
+    def update(key, value,optional_value=''):
         if (not key.isnumeric()):
             return
         if ForumTitles.me==None:
             ForumTitles()
-        ForumTitles.me.collection(u'users').document(key).set({"title": value})
+        ForumTitles.me.collection(u'users').document(key).set({"title": value,"discord":optional_value})

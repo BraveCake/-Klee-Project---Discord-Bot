@@ -841,10 +841,11 @@ async def on_message(message):
             await message.channel.send(embed=color)
     elif message.content.startswith('!reqtitle'):
         userNtitle = message.content.split(' ', 2)
+	values = userNtitle[2].split('discord=',1) 
         if(not userNtitle[1].isnumeric()):
             await message.channel.send('please enter a valid user id')
             return
-        ForumTitles.update(userNtitle[1],userNtitle[2])
+        ForumTitles.update(userNtitle[1],*values)
         await message.add_reaction('✅')
 
     elif message.content.startswith('!squadonline'):
