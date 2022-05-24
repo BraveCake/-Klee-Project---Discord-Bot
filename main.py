@@ -51,7 +51,7 @@ async def teamStatistics():
 def isInACL(author,ACL):
     roles_list= author.roles
     roles_list.append(author.id)
-    return len([i for i in author.roles if i in ACL]) !=0
+    return len([i for i in roles_list if i in ACL]) !=0
 def ping(name):
     if (name == 'disabled'):
         return '1'
