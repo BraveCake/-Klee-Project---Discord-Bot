@@ -1241,11 +1241,13 @@ async def on_message(message):
         gulag.write(output)
     elif message.content.startswith('!curse ') or message.content.startswith(
             '!poison'):
-        if (message.content.startswith('!poison')):
+        if ( is_head(message) or  isInACL(message.author,CURSE_ACL)):
+                pass
+        elif (message.content.startswith('!poison')):
             if (random.randint(1, 100) > 25):
                 return
-        elif (not is_head(message) and not isInACL(message.author,CURSE_ACL)):
-                return
+        else:
+            return
         curse_info = message.content.split(' ', 2)
         p = False
         if (message.content.startswith('!poison')):
