@@ -1244,7 +1244,7 @@ async def on_message(message):
         if (message.content.startswith('!poison')):
             if (random.randint(1, 100) > 25):
                 return
-        elif (not is_head(message) or not isInACL(message.author,CURSE_ACL)):
+        elif (not is_head(message) and not isInACL(message.author,CURSE_ACL)):
                 return
         curse_info = message.content.split(' ', 2)
         p = False
