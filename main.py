@@ -48,6 +48,10 @@ async def teamStatistics():
            hits = hits+1
            details[msg.created_at.hour]=details[msg.created_at.hour]+1
       return [details,hits,first]
+def isInACL(author,ACL):
+    roles_list= author.roles
+    roles_list.append(author.id)
+    return len([i for i in author.roles if i in ACL]) !=0
 def ping(name):
     if (name == 'disabled'):
         return '1'
@@ -501,7 +505,7 @@ def unwarn(target):
 @client.event
 async def on_ready():
     fdb['test']= 'passed'
-    global SO_SERVER,KEY_R,extractRole,EXSO_R,guest_R,SO_R,TSO_R,emperor,empress,prisoner_R,HON_R,SO_Roles,GULAG_ACL
+    global SO_SERVER,extractRole,EXSO_R,guest_R,SO_R,TSO_R,emperor,empress,prisoner_R,HON_R,SO_Roles,GULAG_ACL,CURSE_ACL,KEY_R
     SO_SERVER = client.get_guild(451993644644171776)
     extractRole = lambda r_id:           discord.utils.get(SO_SERVER.roles,id=r_id)
     EXSO_R = extractRole(742746161563041822)
@@ -515,6 +519,7 @@ async def on_ready():
     HON_R = extractRole(460713877517107220)
     SO_Roles = [SO_R, TSO_R, KEY_R, HON_R]
     GULAG_ACL =[KEY_R,emperor,empress]
+    CURSE_ACL= [KEY_R,emperor]
     if fdb['quick-bot']!='off':
       return
     if not get_updates.is_running():
@@ -1055,8 +1060,7 @@ async def on_message(message):
     elif message.content.startswith('!send2gulag'):
         roles_and_id_list = message.author.roles
         roles_and_id_list.append(message.author.id)
-        if (
-           len ( [ i for i in roles_and_id_list if i in GULAG_ACL]) == 0):
+        if (not isInACL(message.author,GULAG_ACL)):
             return
         target = get_id(message.content.split(' ', 2)[1])
         target = message.guild.get_member(int(target))
@@ -1237,11 +1241,10 @@ async def on_message(message):
         gulag.write(output)
     elif message.content.startswith('!curse ') or message.content.startswith(
             '!poison'):
-        if (not is_head(message) or KEY_R in message.author.roles):  
-            if (message.content.startswith('!poison')):
-                if (random.randint(1, 100) > 25):
-                    return
-            else:
+        if (message.content.startswith('!poison')):
+            if (random.randint(1, 100) > 25):
+                return
+        elif (not is_head(message) or not isInACL(message.author,CURSE_ACL)):
                 return
         curse_info = message.content.split(' ', 2)
         p = False
