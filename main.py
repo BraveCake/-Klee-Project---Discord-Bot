@@ -550,6 +550,24 @@ async def on_message(message):
         return
     if (message.author == client.user):
         return
+    if (message.content.startswith('!cast ')):
+        member = await SO_SERVER.fetch_member(message.author.id)
+        if(SO_R in member.roles):
+            if(message.content.count(' ')<3): #incorrect format
+                return
+            voteData = message.content.split(' ',2) #command survery_id vote
+            if(not voteData[1].isnumeric()): #invalid id
+                await message.channel.send("please enter a valid vote data !cast vote_id your vote")
+                return
+            fdb.excute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s)",int(voteData[1]),message.author.id,voteData[2])
+            message.add_reaction('👍')
+            channel_id = fdb.excute("SELECT channel_id FROM survery").fetchone()[0]
+            channel = client.get_channel(channel_id)
+            resultMessage= await channel.fetch_message(voteData[1])
+            resultBoard=message = resultMessage.embeds[0]
+            resultBoard.description = resultBoard.description +"**Vote**:"+voteData[2]+"\n"
+            await resultBoard.edit(embed=resultBoard)
+
     if message.guild is None:
         print("Detected an attempt to use me outside State Official Server")
     def is_head(message):
@@ -763,7 +781,15 @@ async def on_message(message):
         if('=' in topic and topic.split('=')[-2].endswith(' type')):
             type=topic.split('=')[-1]
             topic = topic.rstrip(' type='+type)
-        vote  = await message.channel.send(topic+'\n  ***by '+message.author.name+'***')
+        if (type=='annonymous'):
+            resultBoard = discord.Embed(title="Votes",
+                          description=topic+"\n\n**Received Votes**:\n",
+                          color=int("0x" + "FFD700", 16))
+            resultBoard.set_thumbnail(url="https://i.imgur.com/dPFkTVw.png")
+            resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
+            vote = await message.channel.send(embed=resultBoard)
+            fdb.fdb('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s)',message.id,message.author.name,message.channel.id)
+
         if (type==''):
             await vote.add_reaction('👎')
             await vote.add_reaction('👍')
@@ -772,6 +798,8 @@ async def on_message(message):
             for index in range(int(type)+1):
                 print(numbers[index])
                 await vote.add_reaction(numbers[index])
+
+
 
     elif (message.content.startswith('!say ')):
         if (message.channel.id == 461207618183233557):  #so in game
