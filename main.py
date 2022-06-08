@@ -768,10 +768,10 @@ async def on_message(message):
             await vote.add_reaction('👎')
             await vote.add_reaction('👍')
         if (type.isnumeric()):
-            numbers ="\u0030 \u0031 \u0032 \u0033 \u0034 \u0035 \u0036 \u0037 \u0038 \u0039".split(' ')
+            numbers ="0\u20e3 1\u20e3 2\u20e3 3\u20e3 4\u20e3 5\u20e3 6\u20e3 7\u20e3 8\u20e3 9\u20e3".split(' ')
             for index in range(type.isnumeric()+1):
                 print(numbers[index])
-                await vote.add_reaction(numbers[index].encode('ascii','namereplace'))
+                await vote.add_reaction(numbers[index])
 
     elif (message.content.startswith('!say ')):
         if (message.channel.id == 461207618183233557):  #so in game
