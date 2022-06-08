@@ -770,7 +770,7 @@ async def on_message(message):
         if (type.isnumeric()):
             unicode ="1\u20e3"
             for index in range(type.isnumeric()+1):
-                await vote.add_reaction(index+unicode)
+                await vote.add_reaction(str(index)+unicode)
 
     elif (message.content.startswith('!say ')):
         if (message.channel.id == 461207618183233557):  #so in game
