@@ -771,7 +771,7 @@ async def on_message(message):
             numbers ="\u0030 \u0031 \u0032 \u0033 \u0034 \u0035 \u0036 \u0037 \u0038 \u0039".split(' ')
             for index in range(type.isnumeric()+1):
                 print(numbers[index])
-                await vote.add_reaction(numbers[index])
+                await vote.add_reaction(numbers[index].encode('ascii','namereplace'))
 
     elif (message.content.startswith('!say ')):
         if (message.channel.id == 461207618183233557):  #so in game
