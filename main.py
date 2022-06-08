@@ -762,12 +762,13 @@ async def on_message(message):
         type=''
         if('=' in topic and topic.split('=')[-2].endswith(' type')):
             type=topic.split('=')[-1]
+            topic = topic.rstrip(' topic='+type)
         vote  = await message.channel.send(topic+'\n  ***by '+message.author.name+'***')
         if (type==''):
             await vote.add_reaction('👎')
             await vote.add_reaction('👍')
         if (type.isnumeric()):
-            numbers =":zero:/:one:/:two:/:three:/:four:/:five:/:six:/:seven:/:eight:/:nine:".split('/')
+            numbers ="0️⃣\1️⃣\2️⃣\3️⃣\4️⃣\5️⃣\6️⃣\7️⃣\8️⃣\9️⃣".split('/')
             for index in range(type.isnumeric()+1):
                 await vote.add_reaction(numbers[index])
 
