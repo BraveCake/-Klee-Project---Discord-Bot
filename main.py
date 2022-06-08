@@ -791,6 +791,7 @@ async def on_message(message):
             fdb.fdb('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s)',message.id,message.author.name,message.channel.id)
 
         if (type==''):
+            vote = await message.channel.send(topic+"\n"+"***By "+message.author.name+"***")
             await vote.add_reaction('👎')
             await vote.add_reaction('👍')
         if (type.isnumeric()):
