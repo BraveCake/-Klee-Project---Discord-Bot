@@ -768,9 +768,9 @@ async def on_message(message):
             await vote.add_reaction('👎')
             await vote.add_reaction('👍')
         if (type.isnumeric()):
-            numbers ="\u0030 \u0031 \u0032 \u0033 \u0034 \u0035 \u0036 \u0037 \u0038 \u0039".split(' ')
+            unicode ="1\u20e3"
             for index in range(type.isnumeric()+1):
-                await vote.add_reaction(numbers[index])
+                await vote.add_reaction(index+unicode)
 
     elif (message.content.startswith('!say ')):
         if (message.channel.id == 461207618183233557):  #so in game
