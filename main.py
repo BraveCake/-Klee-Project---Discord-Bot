@@ -769,7 +769,7 @@ async def on_message(message):
             await vote.add_reaction('👍')
         if (type.isnumeric()):
             numbers ="0\u20e3 1\u20e3 2\u20e3 3\u20e3 4\u20e3 5\u20e3 6\u20e3 7\u20e3 8\u20e3 9\u20e3".split(' ')
-            for index in range(type.isnumeric()+1):
+            for index in range(int(type)+1):
                 print(numbers[index])
                 await vote.add_reaction(numbers[index])
 
