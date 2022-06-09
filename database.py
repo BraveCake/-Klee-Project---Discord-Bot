@@ -18,9 +18,10 @@ class Database():
   def execute(self,query,args=None):
     try:
       if(args==None):
-        return self.fdb.execute(query)
+        self.fdb.execute(query)
       else:
-        return self.fdb.execute(query,args)
+        self.fdb.execute(query,args)
+      return self.fdb
     except psycopg2.InterfaceError as e:
       self.__init__()
   def __setitem__(self,key,value):
