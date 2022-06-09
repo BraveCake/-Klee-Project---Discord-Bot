@@ -566,7 +566,8 @@ async def on_message(message):
             resultMessage= await channel.fetch_message(voteData[1])
             resultBoard=message = resultMessage.embeds[0]
             resultBoard.description = resultBoard.description +"**Vote**:"+voteData[2]+"\n"
-            await resultBoard.edit(embed=resultBoard)
+            await resultMessage.edit(embed=resultBoard)
+      return
 
     if message.guild is None:
         print("Detected an attempt to use me outside State Official Server")
