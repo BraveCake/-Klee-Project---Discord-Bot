@@ -552,6 +552,8 @@ async def on_message(message):
         return
     if (message.content.startswith('!cast ')):
         member = await SO_SERVER.fetch_member(message.author.id)
+        print(member.id)
+        print('checking roles')
         if(SO_R in member.roles):
             print("someone casted his vote")
             if(message.content.count(' ')<2): #incorrect format
