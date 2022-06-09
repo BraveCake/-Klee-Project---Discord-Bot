@@ -563,7 +563,7 @@ async def on_message(message):
                 return
             fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2]))
             message.add_reaction('👍')
-            channel_id = fdb.fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
+            channel_id = fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
             channel = client.get_channel(channel_id)
             resultMessage= await channel.fetch_message(voteData[1])
             resultBoard=message = resultMessage.embeds[0]
