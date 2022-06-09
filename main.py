@@ -553,7 +553,6 @@ async def on_message(message):
     if (message.content.startswith('!cast ')):
         member = await SO_SERVER.fetch_member(message.author.id)
         print(member.id)
-        print('checking roles')
         if(SO_R in member.roles):
             print("someone casted his vote")
             if(message.content.count(' ')<2): #incorrect format
@@ -562,9 +561,9 @@ async def on_message(message):
             if(not voteData[1].isnumeric()): #invalid id
                 await message.channel.send("please enter a valid vote data !cast vote_id your vote")
                 return
-            fdb.fdb.excute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s,%s)",(int(voteData[1]),message.author.id,voteData[2]))
+            fdb.fdb.execute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s,%s)",(int(voteData[1]),message.author.id,voteData[2]))
             message.add_reaction('👍')
-            channel_id = fdb.fdb.excute("SELECT channel_id FROM survery").fetchone()[0]
+            channel_id = fdb.fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
             channel = client.get_channel(channel_id)
             resultMessage= await channel.fetch_message(voteData[1])
             resultBoard=message = resultMessage.embeds[0]
