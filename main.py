@@ -789,7 +789,7 @@ async def on_message(message):
             resultBoard.set_thumbnail(url="https://i.imgur.com/dPFkTVw.png")
             resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
             vote = await message.channel.send(embed=resultBoard)
-            fdb.fdb.exectute('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',message.id,message.author.name,message.channel.id)
+            fdb.fdb.execute('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',message.id,message.author.name,message.channel.id)
             return
 
         vote = await message.channel.send(topic + "\n" + "***By " + message.author.name + "***")
