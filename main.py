@@ -553,7 +553,8 @@ async def on_message(message):
     if (message.content.startswith('!cast ')):
         member = await SO_SERVER.fetch_member(message.author.id)
         if(SO_R in member.roles):
-            if(message.content.count(' ')<3): #incorrect format
+            print("someone casted his vote")
+            if(message.content.count(' ')<2): #incorrect format
                 return
             voteData = message.content.split(' ',2) #command survery_id vote
             if(not voteData[1].isnumeric()): #invalid id
