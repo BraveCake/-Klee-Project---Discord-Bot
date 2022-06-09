@@ -781,7 +781,7 @@ async def on_message(message):
         type=''
         if('=' in topic and topic.split('=')[-2].endswith(' type')):
             type=topic.split('=')[-1]
-            topic = topic.rstrip(' type='+type)
+            topic = topic.rstrip('type='+type)
         if (type=='anonymous'):
             resultBoard = discord.Embed(title="Votes",
                           description=topic+"\n\n**Received Votes**:\n",
