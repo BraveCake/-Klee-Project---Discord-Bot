@@ -567,7 +567,7 @@ async def on_message(message):
             channel = client.get_channel(channel_id)
             resultMessage= await channel.fetch_message(int(voteData[1]))
             resultBoard=message = resultMessage.embeds[0]
-            resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n"
+            resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
             await resultMessage.edit(embed=resultBoard)
         return
 
