@@ -563,11 +563,8 @@ async def on_message(message):
                 return
             fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2]))
             await message.add_reaction('✅')
-            channel_id = fdb.execute("SELECT channel_id FROM survery WHERE id=%s",int(voteData[1])).fetchone()[0]
-            print(channel_id)
+            channel_id = fdb.execute("SELECT channel_id FROM survery WHERE id=%s",(int(voteData[1]))).fetchone()[0]
             channel = client.get_channel(channel_id)
-            await channel.send('okay dokay')
-            print(channel)
             resultMessage= await channel.fetch_message(int(voteData[1]))
             resultBoard=message = resultMessage.embeds[0]
             resultBoard.description = resultBoard.description +"\n**Vote**:"+voteData[2]+"\n"
@@ -795,6 +792,7 @@ async def on_message(message):
             resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
             vote = await message.channel.send(embed=resultBoard)
             fdb.execute('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',(message.id,message.author.name,message.channel.id))
+            await message.channel.send('send me a message privately using !cast '+str(message.id)+" your vote to submit your vote")
             return
 
         vote = await message.channel.send(topic + "\n" + "***By " + message.author.name + "***")
