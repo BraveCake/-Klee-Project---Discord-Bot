@@ -781,14 +781,14 @@ async def on_message(message):
         if('=' in topic and topic.split('=')[-2].endswith(' type')):
             type=topic.split('=')[-1]
             topic = topic.rstrip(' type='+type)
-        if (type=='annonymous'):
+        if (type=='anonymous'):
             resultBoard = discord.Embed(title="Votes",
                           description=topic+"\n\n**Received Votes**:\n",
                           color=int("0x" + "FFD700", 16))
             resultBoard.set_thumbnail(url="https://i.imgur.com/dPFkTVw.png")
             resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
             vote = await message.channel.send(embed=resultBoard)
-            fdb.fdb('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s)',message.id,message.author.name,message.channel.id)
+            fdb.fdb('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',message.id,message.author.name,message.channel.id)
             return
 
         vote = await message.channel.send(topic + "\n" + "***By " + message.author.name + "***")
