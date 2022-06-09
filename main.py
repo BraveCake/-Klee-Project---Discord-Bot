@@ -565,7 +565,7 @@ async def on_message(message):
             await message.add_reaction('✅')
             channel_id = fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
             channel = client.get_channel(channel_id)
-            resultMessage= await channel.fetch_message(voteData[1])
+            resultMessage= await channel.fetch_message(int(voteData[1]))
             resultBoard=message = resultMessage.embeds[0]
             resultBoard.description = resultBoard.description +"\n**Vote**:"+voteData[2]+"\n"
             await resultMessage.edit(embed=resultBoard)
