@@ -561,13 +561,13 @@ async def on_message(message):
             if(not voteData[1].isnumeric()): #invalid id
                 await message.channel.send("please enter a valid vote data !cast vote_id your vote")
                 return
-            fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2].replace('**','')))
+            fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2].replace('•','')))
             await message.add_reaction('✅')
             channel_id = fdb.execute("SELECT channel_id FROM survery WHERE id=%s",[int(voteData[1])]).fetchone()[0]
             channel = client.get_channel(channel_id)
             resultMessage= await channel.fetch_message(int(voteData[1]))
             resultBoard=message = resultMessage.embeds[0]
-            resultBoard.description = resultBoard.description +"\n**Vote**:"+voteData[2]+"\n"
+            resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n"
             await resultMessage.edit(embed=resultBoard)
         return
 
