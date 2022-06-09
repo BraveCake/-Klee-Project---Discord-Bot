@@ -561,7 +561,7 @@ async def on_message(message):
             if(not voteData[1].isnumeric()): #invalid id
                 await message.channel.send("please enter a valid vote data !cast vote_id your vote")
                 return
-            fdb.fdb.execute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s)",(int(voteData[1]),message.author.id,voteData[2]))
+            fdb.execute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s)",(int(voteData[1]),message.author.id,voteData[2]))
             message.add_reaction('👍')
             channel_id = fdb.fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
             channel = client.get_channel(channel_id)
@@ -791,7 +791,7 @@ async def on_message(message):
             resultBoard.set_thumbnail(url="https://i.imgur.com/dPFkTVw.png")
             resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
             vote = await message.channel.send(embed=resultBoard)
-            fdb.fdb.execute('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',(message.id,message.author.name,message.channel.id))
+            fdb.execute('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',(message.id,message.author.name,message.channel.id))
             return
 
         vote = await message.channel.send(topic + "\n" + "***By " + message.author.name + "***")

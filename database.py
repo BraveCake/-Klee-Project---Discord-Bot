@@ -15,6 +15,14 @@ class Database():
     except psycopg2.InterfaceError as e:
       self.__init__()
     return self.fdb.fetchone()[0]
+  def execute(self,query,args=None):
+    try:
+      if(args==None):
+        self.fdb.execute(query)
+      else:
+        self.fdb.execute(query,args)
+    except psycopg2.InterfaceError as e:
+      self.__init__()
   def __setitem__(self,key,value):
     try:
       self.fdb.execute("INSERT INTO main (key,value) VALUES(%s,%s) ON CONFLICT (key) DO UPDATE SET value =%s",(key,value,value))
