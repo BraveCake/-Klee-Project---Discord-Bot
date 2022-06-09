@@ -561,7 +561,7 @@ async def on_message(message):
             if(not voteData[1].isnumeric()): #invalid id
                 await message.channel.send("please enter a valid vote data !cast vote_id your vote")
                 return
-            fdb.fdb.execute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s,%s)",(int(voteData[1]),message.author.id,voteData[2]))
+            fdb.fdb.execute("INSERT INTO votes(survery_id,voter_id,vote) VALUES (%s, %s, %s)",(int(voteData[1]),message.author.id,voteData[2]))
             message.add_reaction('👍')
             channel_id = fdb.fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
             channel = client.get_channel(channel_id)
