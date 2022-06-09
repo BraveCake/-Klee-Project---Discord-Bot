@@ -562,12 +562,12 @@ async def on_message(message):
                 await message.channel.send("please enter a valid vote data !cast vote_id your vote")
                 return
             fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2]))
-            await message.add_reaction('👍')
+            await message.add_reaction('✅')
             channel_id = fdb.execute("SELECT channel_id FROM survery").fetchone()[0]
             channel = client.get_channel(channel_id)
             resultMessage= await channel.fetch_message(voteData[1])
             resultBoard=message = resultMessage.embeds[0]
-            resultBoard.description = resultBoard.description +"**Vote**:"+voteData[2]+"\n"
+            resultBoard.description = resultBoard.description +"\n**Vote**:"+voteData[2]+"\n"
             await resultMessage.edit(embed=resultBoard)
         return
 
@@ -785,8 +785,8 @@ async def on_message(message):
             type=topic.split('=')[-1]
             topic = topic.rstrip('type='+type)
         if (type=='anonymous'):
-            resultBoard = discord.Embed(title="Votes",
-                          description=topic+"\n\n**Received Votes**:\n",
+            resultBoard = discord.Embed(title="Voting",
+                          description=topic+"\n\n**Received Votes**:\n\n",
                           color=int("0x" + "FFD700", 16))
             resultBoard.set_thumbnail(url="https://i.imgur.com/dPFkTVw.png")
             resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
