@@ -33,6 +33,9 @@ kw = [
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
+async def react(message,code):
+    reactions= ['✅']
+    await message.add_reaction(reactions[code])
 async def teamStatistics():
       hits =0
       details= [0]*24
@@ -1084,7 +1087,7 @@ async def on_message(message):
         if (key == ''):
             return
         fdb[key] = value
-        await message.add_reaction('✅')
+        await react(message,0)
         return
     elif message.content.startswith('!forget'):
         try:
@@ -1093,7 +1096,7 @@ async def on_message(message):
                 key = '~' + key + '~'
             del fdb[key]
         finally:
-            await message.add_reaction('✅')
+            await react(message,0)
             return
         return
     elif message.content.startswith("!forgetall*"):
@@ -1189,7 +1192,7 @@ async def on_message(message):
         info = eval(info)
         info['PingName'] = name
         fdb['(*' + str(message.author.id)] = str(info)
-        await message.add_reaction('✅')
+        await react(message,0)
     elif message.content.startswith('!set-ig'):
         name = message.content.split(' ', 1)[1]
         if len(name) > 20 or re.search(
@@ -1202,7 +1205,7 @@ async def on_message(message):
         info = eval(info)
         info['IG-name'] = name
         fdb['(*' + str(message.author.id)] = str(info)
-        await message.add_reaction('✅')
+        await react(message,0)
     elif message.content.startswith('!rgb2hex'):
         rgb = message.content.split(' ')
         trgb = rgb[1] + ' ' + rgb[2] + ' ' + rgb[3]
@@ -1374,15 +1377,15 @@ async def on_message(message):
         curse.write(output)
         await message.channel.send("The curse has been removed successfully")
         curse.close()
-    elif message.content.startswith('!banTrials'):
+    elif message.content.startswith('!changerole '):
+        info = ( i for i in message.content.split(' '))
+        next(info)
+        old_role,new_role= next(info)
         for member in message.guild.members:
-            if (message.author.id == member.id):
-                continue
-            if (member.id == client.user.id):
-                continue
-            if (TSO_R in member.roles):
-                await member.remove_roles(TSO_R)
-                await member.add_roles(SO_R)
+            if ( old_role in [role.name for role in member.roles]):
+                await modifyRole(message, member.id, old_role, 0)
+                await modifyRole(message, member.id, new_role, 1)
+                await react(message,0)
     elif ms.startswith('!play'):  #Command for MEE6 no need to report it
         return
     elif message.content == '!settings':
@@ -1409,7 +1412,7 @@ async def on_message(message):
         if (input[1] == 'status'):
             await client.change_presence(activity=discord.Game(
                 name=str(input[2])))
-        await message.add_reaction('✅')
+        await react(message,0)
     elif ms.startswith('!count'):
         threshold = int(ms.split(' ')[1])
         if (threshold > 60):
@@ -1457,7 +1460,7 @@ async def on_message(message):
         await message.channel.send(hex_to_rgb(ms.split(' ', 1)[1]))
     elif ms.startswith('!stimer'):
         info = ms.split(' ', 2)
-        await message.add_reaction('✅')
+        await react(message,0)
         await asyncio.sleep(int(info[1]) * 60)
         await message.reply("time up" if len(info) < 3 else info[2])
     elif message.content == '!updates':
@@ -1700,7 +1703,7 @@ async def on_message(message):
     elif message.content=='!cancel':
       if (message.channel.id != 810279347251839026):
         cancel = True
-        await message.add_reaction('✅')
+        await react(message,0)
 
 
 
