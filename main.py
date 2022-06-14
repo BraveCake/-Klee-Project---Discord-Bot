@@ -1378,7 +1378,7 @@ async def on_message(message):
         await message.channel.send("The curse has been removed successfully")
         curse.close()
     elif message.content.startswith('!changerole '):
-        info = ( i for i in message.content.split(' '))
+        info = ( i for i in message.content.split(':'))
         next(info)
         old_role,new_role= next(info)
         for member in message.guild.members:
