@@ -1377,7 +1377,7 @@ async def on_message(message):
         await message.channel.send("The curse has been removed successfully")
         curse.close()
     elif message.content.startswith('!changerole '):
-        if(not is_head(message):
+        if(not is_head(message)):
             return
         info= message.content.split(' ',1)[1]
         old_role,new_role= info.split(' : ')
