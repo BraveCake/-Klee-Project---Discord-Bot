@@ -578,9 +578,7 @@ async def on_message(message):
     if message.guild is None:
         print("Detected an attempt to use me outside State Official Server")
     def is_head(message):
-        if not message.author.guild_permissions.administrator:
-                return False
-        return True
+        return message.author.guild_permissions.administrator:
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
     #players = players_info(True)
     if (message.content.lower() == 'klee'):
@@ -1379,6 +1377,8 @@ async def on_message(message):
         await message.channel.send("The curse has been removed successfully")
         curse.close()
     elif message.content.startswith('!changerole '):
+        if(not is_head(message):
+            return
         info= message.content.split(' ',1)[1]
         old_role,new_role= info.split(' : ')
         for member in message.guild.members:
