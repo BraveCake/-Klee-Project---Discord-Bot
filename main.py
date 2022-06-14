@@ -491,6 +491,7 @@ async def cursed(message):
 
 
 async def modifyRole(ctx, id, role, controller):
+    id= str(id)
     role = discord.utils.get(ctx.guild.roles, name=role)
     target = ctx.guild.get_member(int(get_id(id)))
     if (controller == 1):
