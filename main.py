@@ -578,7 +578,7 @@ async def on_message(message):
     if message.guild is None:
         print("Detected an attempt to use me outside State Official Server")
     def is_head(message):
-        return message.author.guild_permissions.administrator:
+        return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
     #players = players_info(True)
     if (message.content.lower() == 'klee'):
