@@ -457,6 +457,8 @@ def rollDice(message):
     return random.randint(0, x - 1) + 1
 
 async def cursed(message):
+    if message.guild is None:
+        return 0
     curseFile =str(message.guild.id)+'curse.txt'
     if ( not os.path.exists(curseFile) ):
         return 0
