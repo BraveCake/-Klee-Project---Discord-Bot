@@ -31,7 +31,8 @@ kw = [
     'team-auto','teamchat-commands','dashboard','quick-bot'
 ]
 TRUSTED_SERVERS= [451993644644171776 #MAIN DISCORD
-    ,376647426334785557] #PC DISCORD
+    ,376647426334785557,#PC DISCORD
+                  691199564262146058]  #nanika private - my testing server
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
@@ -161,9 +162,6 @@ async def team_chat_mute(message):
     await message.channel.set_permissions(message.author,
                                           read_messages=True,
                                           send_messages=False)
-    await client.get_channel(812678973037215754).send(
-        message.author.mention + " attempted a forbidden action in " +
-        message.channel.name)
 
 
 def create_profile(ctx, id):
