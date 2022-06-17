@@ -567,7 +567,7 @@ async def on_message(message):
         return
     if (message.content.startswith('!cast ')):
         member = message.author
-        if(message.content.count(' ')<3): #incorrect format
+        if(message.content.count(' ')<2): #incorrect format
             return
         voteData = message.content.split(' ',2) #command survery_id vote
         if(not voteData[1].isnumeric()): #invalid id
@@ -787,7 +787,7 @@ async def on_message(message):
             resultBoard = discord.Embed(title="Voting",
                           description=topic+"\n\n**Received Votes**:\n\n",
                           color=int("0x" + "FFD700", 16))
-            resultBoard.set_thumbnail(url="https://i.imgur.com/dPFkTVw.png")
+            resultBoard.set_thumbnail(url="https://media.discordapp.net/attachments/987410793429618729/987452888680919081/unknown.png?width=1145&height=644")
             resultBoard.set_author(name=message.author.name,icon_url=message.author.avatar_url)
             vote = await message.channel.send(embed=resultBoard)
             fdb.execute('INSERT INTO survery (id,author,channel_id) VALUES(%s,%s,%s)',(vote.id,message.author.name,message.channel.id))
