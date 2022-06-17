@@ -23,5 +23,6 @@ the following 4 commands can be used to get info about the players amount in cit
 !op @user : gives the mentioned user read & message access to all server channels.(Can only be used by administrator)
 
 !extensions : use it to view our unique extensions (discord & forum extension are there)
+
 __ Most Recent updates __
-**Klee not longer receive the same amount of the support/regular updates from the developer**
+**Klee will not longer receive the same amount of the support/regular updates from the developer**
