@@ -444,7 +444,7 @@ def rollDice(message):
 async def cursed(message):
     curseFile =str(message.guild.id)+'curse.txt'
     if ( not os.path.exists(curseFile) ):
-        return
+        return 0
     curse = open(curseFile, 'r')
     cm = 0
     try:
