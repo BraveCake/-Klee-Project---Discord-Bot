@@ -36,12 +36,12 @@ client = discord.Client(intents=intents)
 async def react(message,code):
     reactions= ['✅']
     await message.add_reaction(reactions[code])
-async def teamStatistics():
+async def teamStatistics(message):
       hits =0
       details= [0]*24
       yesterday =datetime.now()
       yesterday = yesterday - timedelta(hours=yesterday.hour,minutes=yesterday.minute,seconds=yesterday.second)
-      tc = client.get_channel(462841576616361987)
+      tc = discord.utils.get(message.guild.channels,name='team-chat')
       first = ''
       async for msg in tc.history(limit=None,after=yesterday):
            if(first==''):
@@ -64,6 +64,7 @@ def ping(name):
             if (profile_info["PingName"] == name):
                 return '<@!' + profile.lstrip('(*') + '>'
     return '0'
+""" #Commented since SO Server webhook is gone
 @tasks.loop(hours=1.0)
 async def post_statistics():
   if not datetime.now().hour==23:
@@ -71,7 +72,7 @@ async def post_statistics():
   statistics = await teamStatistics()
   channel= discord.utils.get(SO_SERVER.channels,name=fdb['statistics'])
   await channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(datetime.now())+'\nfirst message sent today: '+statistics[2])
-  
+  """
 def players_info(details): 
   try:
      response = requests.get("http://jarno.pro/stuff/api/ab.php")
@@ -301,12 +302,9 @@ async def lottery():
             winner = l
             break
     if (isinstance(winner, list)):
-        response = response + os.linesep + (await client.fetch_user(winner[0]
-                                                                    )).mention
+        localWinner = await client.fetch_user(winner[0])
+        await localWinner.send('Congratulations you have won the lottery')
         send_mora('000', winner[0], '50000')
-    else:
-        response = response + os.linesep + "Unfortunately none was able to win it!!"
-    await client.get_channel(464028850091851786).send(response)
     lottery.close()
     lottery = open('lottery.txt', 'w')
     lottery.close()
@@ -442,7 +440,7 @@ def rollDice(message):
     return random.randint(0, x - 1) + 1
 
 async def cursed(message):
-    curse = open('curse.txt', 'r')
+    curse = open(str(message.guild.id)+'curse.txt', 'r')
     cm = 0
     try:
         for l in curse:
@@ -512,16 +510,10 @@ async def on_ready():
     global SO_SERVER,extractRole,EXSO_R,guest_R,SO_R,TSO_R,emperor,empress,prisoner_R,HON_R,SO_Roles,GULAG_ACL,CURSE_ACL,KEY_R
     SO_SERVER = client.get_guild(451993644644171776)
     extractRole = lambda r_id:           discord.utils.get(SO_SERVER.roles,id=r_id)
-    EXSO_R = extractRole(742746161563041822)
-    guest_R = extractRole(769304697127174186)
-    SO_R = extractRole(452369040287989780)
     KEY_R = extractRole(935913018380927046)
-    TSO_R = extractRole(452369116611739650)
     emperor = extractRole(786635154432720897)
     empress = extractRole(870694391373770752)
-    prisoner_R = extractRole(749576592313024552) 
-    HON_R = extractRole(460713877517107220)
-    SO_Roles = [SO_R, TSO_R, KEY_R, HON_R]
+    prisoner_R = extractRole(749576592313024552)
     GULAG_ACL =[KEY_R,emperor,empress]
     CURSE_ACL= [KEY_R,emperor]
     if fdb['quick-bot']!='off':
@@ -530,7 +522,7 @@ async def on_ready():
         get_updates.start()
     lottery.start()
     notify_me.start()
-    post_statistics.start()
+    #post_statistics.start()
     update_join_quit.start()
     reset_warns.start()
     print('we have logged in as {0.user}'.format(client))
@@ -550,33 +542,30 @@ async def on_message(message):
     
     global m, sev, limiter, kw, so_roster,cancel
     ch = await cursed(message)
-    if ch > 0 and message.channel.id != 815610398039867402:  
+    if ch > 0 and message.channel.name != 'klee-dashboard': #curses effect disabled in klee's dashboard
         return
     if (message.author == client.user):
         return
     if (message.content.startswith('!cast ')):
-        member = await SO_SERVER.fetch_member(message.author.id)
-        print(member.id)
-        if(SO_R in member.roles or HON_R in member.roles):
-            print("someone casted his vote")
-            if(message.content.count(' ')<2): #incorrect format
-                return
-            voteData = message.content.split(' ',2) #command survery_id vote
-            if(not voteData[1].isnumeric()): #invalid id
-                await message.channel.send("please enter a valid vote data !cast vote_id your vote")
-                return
-            fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2].replace('•','')))
-            await message.add_reaction('✅')
-            channel_id = fdb.execute("SELECT channel_id FROM survery WHERE id=%s",[int(voteData[1])]).fetchone()[0]
-            channel = client.get_channel(channel_id)
-            resultMessage= await channel.fetch_message(int(voteData[1]))
-            resultBoard=message = resultMessage.embeds[0]
-            resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
-            await resultMessage.edit(embed=resultBoard)
+        member = message.author
+        if(message.content.count(' ')<3): #incorrect format
+            return
+        voteData = message.content.split(' ',2) #command survery_id vote
+        if(not voteData[1].isnumeric()): #invalid id
+            await message.channel.send("please enter a valid vote data !cast vote_id your vote")
+            return
+        fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2].replace('•','')))
+        await react(message,1)
+        channel_id = fdb.execute("SELECT channel_id FROM survery WHERE id=%s",[int(voteData[1])]).fetchone()[0]
+        channel = client.get_channel(channel_id)
+        resultMessage= await channel.fetch_message(int(voteData[1]))
+        resultBoard=message = resultMessage.embeds[0]
+        resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
+        await resultMessage.edit(embed=resultBoard)
         return
 
     if message.guild is None:
-        print("Detected an attempt to use me outside State Official Server")
+        print("Detected an attempt to use me outside trusted Servers")
     def is_head(message):
         return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
@@ -585,18 +574,12 @@ async def on_message(message):
         await message.channel.send(' Ta-da! Klee is here!')
     ms = message.content
     if (ms.find(':') != -1
-            and (ms.find('(SO)') != -1 or ms.find('TEAM') != -1)):
+            and (ms.find('(') != -1 or ms.find('TEAM') != -1)):
         ms = ms.split(':', 2)[1]
     ms = ms.lstrip()
-    if (fdb['status'] == 'default' and message.content.startswith('There')
-            and message.author.id == 462940393093201921):
-        await client.change_presence(activity=discord.Game(
-            name="with " + str(message.content.split('**', 2)[1]) +
-            " State Officials"))
-
-    if (message.channel.name != 'civilian-teamsay'):
+    if (message.channel.name != 'teamchat'):
         if (ms == '!online'):
-            tc = client.get_channel(461207618183233557)
+            tc = discord.utils.get(message.guild.channels,name='ig-duty-chat')
             m = client.get_channel(message.channel.id)
             temp = await tc.send('.online')
             await temp.delete()
@@ -614,8 +597,7 @@ async def on_message(message):
                     return
     #fdb['dashboard'] = dashboard
     if (message.content.startswith('!logs')):
-        if (message.channel.id != 810279347251839026
-                and message.channel.name != fdb['dashboard']):  #so-logs
+        if (message.channel.id != int(fdb[str(message.guild.id)+'dashboard'])):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
             return
@@ -656,8 +638,7 @@ async def on_message(message):
         await message.channel.send(output)
         limiter = False
     elif (message.content.startswith('!lines')):
-        if (message.channel.id != 810279347251839026
-                and message.channel.name != fdb['dashboard']):  #so-logs
+        if (message.channel.id != int(fdb[str(message.guild.id)+'dashboard'])):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
             return
@@ -716,22 +697,18 @@ async def on_message(message):
         limiter = False
 
     elif (message.content.startswith('.say ')):
-        if (message.channel.id == 462841576616361987):  #team-chat
+        if (message.channel.name == 'ig-team-chat'):  #team-chat
             await message.channel.send(
                 'You have received a one warning point for using .say command here once your points exceed 2 you will lose your access to this channel the warning points are reset daily but the access cannot be reteived without intervention'
             )
-            await client.get_channel(812678973037215754).send(
-                message.author.mention + " attempted a forbidden action in " +
-                message.channel.name)
             profile = eval(fdb['(*' + str(message.author.id)])
             if (profile['Warns'] >= 2):
                 await team_chat_mute(message)
                 return
             profile['Warns'] = profile['Warns'] + 1
             fdb['(*' + str(message.author.id)] = str(profile)
-
             return
-        if (message.channel.id != 461207618183233557):  #so-ingame
+        if (message.channel.name != 'ig-duty-chat'):  #so-ingame
             await message.channel.send(
                 "You don't have permission to use this command")
             return
@@ -778,7 +755,7 @@ async def on_message(message):
             await message.channel.send("#FFCA33" + author + " : " + m)
     elif message.content =='!average':
       await message.add_reaction('✅')
-      statistics = await teamStatistics()
+      statistics = await teamStatistics(message)
       await message.channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(datetime.now())+'\nfirst message sent today: '+statistics[2])
     elif message.content.startswith('!vote'):
         topic = message.content.split(' ',1)[1]
@@ -810,11 +787,11 @@ async def on_message(message):
 
 
     elif (message.content.startswith('!say ')):
-        if (message.channel.id == 461207618183233557):  #so in game
+        if (message.channel.name == 'ig-duty-chat'):  #so in game
             return
         m = message.content.replace('!say ', '', 1)
         await message.delete()
-        if (message.channel.id != 462841576616361987):
+        if (message.channel.id != 'ig-team-chat'):
             await message.channel.send(m)
             return
         author = ' (' + str(message.author) + ')'
@@ -924,7 +901,7 @@ async def on_message(message):
                 target)
             await message.channel.send(embed=color)
     elif message.content.startswith('!unwarn'):
-        if (is_head(message) and KEY_R in message.author.roles):
+        if (is_head(message) ):
             target = get_id(message.content.split(' ', 1)[1])
             unwarn(target)
 
@@ -1112,45 +1089,15 @@ async def on_message(message):
         target = get_id(message.content.split(' ', 2)[1])
         target = message.guild.get_member(int(target))
         await target.add_roles(prisoner_R)
-        gulag = open('gulag.txt', 'a')
-        gulag.write(str(target.id) + ":")
+        with open(str(message.guild.id)+'gulag.txt', 'a') as gulag :
+            gulag.write(str(target.id) + ":")
+            for role in target.roles:
+                gulag.write(str(role.name)+"+")
+                modifyRole(message,role,0)
+            gulag.seek(f.tell() - 1, os.SEEK_SET)
+            f.write('\n')
+        await react(message,1)
         rs = 0
-        try:
-            if (EXSO_R in target.roles):
-                await target.remove_roles(EXSO_R)
-                gulag.write('EXSO')
-                rs = rs + 1
-            if (guest_R in target.roles):
-                await target.remove_roles(guest_R)
-                if (rs > 0):
-                    gulag.write('+')
-                gulag.write('guest')
-                rs = rs + 1
-            if (SO_R in target.roles):
-                await target.remove_roles(SO_R)
-                if (rs > 0):
-                    gulag.write('+')
-                gulag.write('SO')
-                rs = rs + 1
-            if (TSO_R in target.roles):
-                await target.remove_roles(TSO_R)
-                if (rs > 0):
-                    gulag.write('+')
-                gulag.write('TSO')
-                rs = rs + 1
-            if (HON_R in target.roles):
-                await target.remove_roles(HON_R)
-                if (rs > 0):
-                    gulag.write('+')
-                gulag.write('HON')
-                rs = rs + 1
-            gulag.write(os.linesep)
-            if not message.content.endswith('x'):
-                await target.send('Welcome to the gulag')
-        except:
-            print('gulag exception')
-        finally:
-            gulag.close()
     elif message.content.startswith('!profile'):
         target = id = None
         note = '\n\n For setting up IG-name use !set-ig <name>\nUse !set-ping <name> to set or change the name which will be used to mention you whether ig or discord you can also disable it by using !set-ig disabled if you find it annoying to be mentioned\n '
@@ -1230,7 +1177,7 @@ async def on_message(message):
     elif ms.startswith('!ping '):
         if (fdb["ping"] == "off"):
             return
-        if (message.channel.id == 462841576616361987
+        if (message.channel.name == 'ig-team-chat'
                 and fdb['team-ping'] == 'off'):
             if (ms.content != message.content):
                 return
@@ -1311,7 +1258,7 @@ async def on_message(message):
                 em = ''
                 curse_info.append(target)
 
-        curse = open('curse.txt', 'a+')
+        curse = open(str(message.guild.id)+'curse.txt', 'a+')
         curse_info[2] = get_id(curse_info[2])
         curse.write(curse_info[2] + ':' + curse_info[1])
         if (p):
@@ -1430,7 +1377,7 @@ async def on_message(message):
         else:
             await modifyRole(message, targetNrole[1], targetNrole[2], 0)
     elif message.content.startswith('!rename'):
-        if not is_head(message) and not KEY_R in message.author.roles:
+        if not is_head(message) :
             return
         info = message.content.split(' ', 2)
         info[1] = get_id(info[1])
@@ -1701,7 +1648,7 @@ async def on_message(message):
         bal = eval(fdb['(*' + str(message.author.id)])['Balance']
         await message.channel.send('>>> Your current balance is $' + str(bal))
     elif message.content=='!cancel':
-      if (message.channel.id != 810279347251839026):
+      if (message.channel.name != 'klee-dashboard'):
         cancel = True
         await react(message,0)
 
@@ -1869,18 +1816,18 @@ async def on_message(message):
             send_mora(target, source, value)
         await message.channel.send(result)
     elif message.content.startswith('!kmute'):
-        if not is_head(message) and not KEY_R in message.author.roles:
+        if not is_head(message) :
             return
         target = message.guild.get_member(
             int(get_id(message.content.split(' ', 1)[1])))
         await message.channel.set_permissions(target, send_messages=False)
     elif message.content.startswith('!kunmute'):
-        if not is_head(message) and not KEY_R in message.author.roles:
+        if not is_head(message) :
             return
         target = message.guild.get_member(
             int(get_id(message.content.split(' ', 1)[1])))
         await message.channel.set_permissions(target, overwrite=None)
-    elif message.channel.id == 461207618183233557 and '~' + ms + '~' in fdb.keys(
+    elif message.channel.name == 'ig-duty-chat' and '~' + ms + '~' in fdb.keys(
     ):
         await message.channel.send(fdb['~' + ms + '~'])
     elif ms.startswith('!translate'):
@@ -1918,22 +1865,22 @@ async def on_message(message):
         await message.channel.send(ss)
 
     elif ms.startswith('!'):
-        if ms != message.content and message.channel.id != 461207618183233557:
+        if ms != message.content and message.channel.name != 'ig-duty-chat':
             return
         try:
             verify = ' '
             if ' ' in message.content:
                 verify = message.content.split(' ', 1)[1]
             say = ""
-            if message.channel.id == 462841576616361987 and verify != '+' and fdb['teamchat-commands']:
+            if message.channel.name == 'ig-team-chat' and verify != '+' and fdb['teamchat-commands']:
                 say = ".say "
             await message.channel.send(say + str(fdb[ms]))
         except:
             print('reporting unexisting entity ' + ms)
         finally:
             return
-    elif message.channel.id == 462841576616361987 and message.author.id != 463528533143060491 and fdb[
-            'team-auto'] != 'off' and message.author.id != 403112358630916096:  #team-say, not the bot/webhook and the option enabled
+    elif message.channel.name=='ig-team-chat' and fdb[
+            'team-auto'] != 'off' and message.author.bot != True:  #team-say, not the bot/webhook and the option enabled
         author = message.author.id
         profile = None
         try:
@@ -1981,13 +1928,13 @@ async def on_reaction_remove(reaction, user):
 
 @client.event
 async def on_member_join(member):
-    tc = discord.utils.get(SO_SERVER.channels,name=fdb['wm'])
+    tc = discord.utils.get(member.guild.channels,name=fdb['wm'])
     await tc.send('Welcome to our server ' + member.mention)
 
 
 @client.event
 async def on_member_remove(member):
-    tc = discord.utils.get(SO_SERVER.channels,name=fdb['wm'])
+    tc = discord.utils.get(member.guild.channels,name=fdb['wm'])
     await tc.send('Bye bye ' + member.name + ', you will be missed.')
 keep_alive()
 client.run(os.getenv('TOKEN'))
