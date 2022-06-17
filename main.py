@@ -1002,15 +1002,17 @@ async def on_message(message):
 
     elif message.content == ('!kill'):
         if message.channel.name != 'klee-dashboard':
-            if(message.guild.id not in HTRUSTED_SERVERS):
-              return
+            return
+        if (message.guild.id not in HTRUSTED_SERVERS):
+            return
         else:
             await client.close()
             await message.add_reaction('✅')
     elif message.content == '!restart':
         if message.channel.name != 'klee-dashboard':
-            if (message.guild.id not in HTRUSTED_SERVERS):
-              return
+            return
+        if (message.guild.id not in HTRUSTED_SERVERS):
+            return
         else:
             await message.add_reaction('✅')
             os.execv(sys.executable, ['python'] + sys.argv)
