@@ -159,6 +159,7 @@ async def dynamic_help(reaction, user):
             and user != client.user):
         state = int(reaction.message.embeds[0].title[-1])-1
         result = reaction.message.embeds[0]
+        result.title= 'List of commands '+str(state+1)
         with open('help2.txt', 'r') as h2:
             with open('help.txt', 'r') as h1:
                 with open('help3.txt','r') as h3:
