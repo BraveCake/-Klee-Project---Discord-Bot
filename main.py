@@ -527,7 +527,7 @@ def unwarn(target):
 @client.event
 async def on_ready():
     fdb['test']= 'passed'
-    global SO_SERVER,extractRole,EXSO_R,guest_R,SO_R,TSO_R,emperor,empress,prisoner_R,HON_R,SO_Roles,GULAG_ACL,CURSE_ACL,KEY_R
+    global SO_SERVER,extractRole,emperor,empress,prisoner_R,GULAG_ACL,CURSE_ACL
     SO_SERVER = client.get_guild(451993644644171776)
     extractRole = lambda r_id:           discord.utils.get(SO_SERVER.roles,id=r_id)
     KEY_R = extractRole(935913018380927046)
@@ -1942,11 +1942,7 @@ async def on_message(message):
         async with lock:
           if (fdb[str(message.guild.id)+'anonymous'] != 'off'):
               author = ''
-          rank = '#ffffff'
-          for r in SO_Roles:
-              if (r in message.author.roles):
-                  rank = '#ffa500'
-                  break
+          rank = '' 
           await message.channel.send(".say " + rank + profile['IG-name'] +
                                    " : #c5f9f4 " + message.content)
           await asyncio.sleep(3.5)
