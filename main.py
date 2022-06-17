@@ -38,6 +38,14 @@ TRUSTED_SERVERS= [451993644644171776 #MAIN DISCORD
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
+def intializeSettings(id):
+    counter =0
+    defaultValues = ['on','on','off','','off','on','on','off']
+    for key in kw:
+        if(key in htp):
+            continue
+        fdb[str(id)+key]= defaultValues[counter]
+        counter=counter+1
 async def react(message,code):
     reactions= ['✅']
     await message.add_reaction(reactions[code])
@@ -1958,5 +1966,8 @@ async def on_member_join(member):
 async def on_member_remove(member):
     tc = discord.utils.get(member.guild.channels,name=fdb[str(member.guild.id)+'wm'])
     await tc.send('Bye bye ' + member.name + ', you will be missed.')
+@client.event
+async def on_guild_join(guild):
+    intializeSettings(guild.id)
 keep_alive()
 client.run(os.getenv('TOKEN'))
