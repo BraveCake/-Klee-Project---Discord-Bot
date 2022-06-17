@@ -159,18 +159,20 @@ async def dynamic_help(reaction, user):
             and user != client.user):
         state = int(reaction.message.embeds[0].title[-1])-1
         result = reaction.message.embeds[0]
-        result.title= 'List of commands '+str(state+2)
         with open('help2.txt', 'r') as h2:
             with open('help.txt', 'r') as h1:
                 with open('help3.txt','r') as h3:
                     pages = [h1,h2,h3]
                     if reaction.emoji == '➡️':
-                        result.description = pages[(state+1)%3].read()
-                        await reaction.message.edit(embed=result)
+                        state =(state+1)%3
+                        result.description = pages[state].read()
+
                     elif reaction.emoji == '⬅️':
                         state =3 if state==0 else state
-                        result.description = pages[(state-1)].read()
-                        await reaction.message.edit(embed=result)
+                        state =state-1
+                        result.description = pages[state].read()
+                    result.title = 'List of commands ' + str(state + 1)
+                    await reaction.message.edit(embed=result)
 
 
 async def team_chat_mute(message):
