@@ -1,4 +1,4 @@
-x!free *user* : Set free a specific user from the gulag ** this command can only be used by the holders of Gulag Emperor Role also it cannot be used on the users who were not sent by !send2gulag command **
+!free *user* : Set free a specific user from the gulag ** this command can only be used by the holders of Gulag Emperor Role also it cannot be used on the users who were not sent by !send2gulag command **
 
 !logs *player_name* *start_date in Y-M-D format*: grab total number of lines sent by a player in the civilian team chat *note the player name is case insenstivie*
 
@@ -65,6 +65,8 @@ x!free *user* : Set free a specific user from the gulag ** this command can only
 
 !reqtitle forum_user_id title: modifies/adds you a custom title if you're using our custom forum extension
 !average : shows the average amount of messages sent in teamchat today
+
+!extensions : use it to view our unique extensions (discord & forum extension are there)
 __ Most Recent updates __
-**-- Migrated both of klee hosting & database the downtime should be less now --**
+** Klee's developer support might be dropped permanently**
 

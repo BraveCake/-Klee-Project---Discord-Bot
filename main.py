@@ -1356,7 +1356,11 @@ async def on_message(message):
           if key in htp:
               if (message.guild.id not in HTRUSTED_SERVERS):
                       continue
-          value = str(fdb[str(message.guild.id)+key])
+          value=''
+          try:
+            value = str(fdb[str(message.guild.id)+key])
+          except:
+            value =''
           listo = listo + key + " : " + value + os.linesep
         info = discord.Embed(title="Bot Settings",
                              description=listo,
