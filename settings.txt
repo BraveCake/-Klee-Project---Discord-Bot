@@ -6,7 +6,6 @@ wm: the name of the channel at which klee will send welcome messages to change i
 
 anonymous: when on it makes messages sent by klee in team chat/so discord identityless (no author name)
 
-status : descript on klee's current status
 apps_notifier: klee will notify us if there's a new SO applicant when it's on
 
 statistics: channel name of statistics service klee will post the total messages sent on daily basis by the end of the day at that channel
@@ -15,8 +14,5 @@ team-auto: .say command is not needed to send messages in team chat when it's on
 
 teamchat-commands : klee's learnt commands via !learn won't work in team chat when it's off mainly exist to prevent spam/abuse
 
-dashboard : current channel name of klee's dashboard CHANGE IT BEFORE RENAMING THIS CHANNEL
-
-quick-bot : disables extra functionalities of klee that makes it slow (mainly when booting up) it's a useful tool when testing a new feature/ restarting klee frequently
 
 

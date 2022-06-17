@@ -26,10 +26,12 @@ from forumTitles import ForumTitles
 fdb = Database()
 #fdb['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
 #fdb['quick-bot'] = 'true'
+htp=['statistics','quickl-bot','status','dashboard'] #high trust perks
 kw = [
     "spam", "ping", "team-ping", "wm", "anonymous", "status", 'apps_notifier','statistics',
     'team-auto','teamchat-commands','dashboard','quick-bot'
 ]
+HTRUSTED_SERVERS = [451993644644171776]
 TRUSTED_SERVERS= [451993644644171776 #MAIN DISCORD
     ,376647426334785557,#PC DISCORD
                   691199564262146058]  #nanika private - my testing server
@@ -529,8 +531,7 @@ async def on_ready():
     update_join_quit.start()
     reset_warns.start()
     print('we have logged in as {0.user}'.format(client))
-    if (fdb['status'] != 'default'):
-        await client.change_presence(activity=discord.Game(name=fdb['status']))
+    await client.change_presence(activity=discord.Game(name=fdb['status']))
 
 
 sev = '#FFFFFF'
@@ -720,7 +721,7 @@ async def on_message(message):
         await message.delete()
         await asyncio.sleep(3.3)
         author = ' (' + str(message.author) + ')'
-        if fdb['anonymous'] != 'off':
+        if fdb[str(message.guild.id)+'anonymous'] != 'off':
             author = ""
         if (sev != 'special'):
             await message.channel.send("#FFCA33" + author + " : " + str(sev) +
@@ -799,7 +800,7 @@ async def on_message(message):
             await message.channel.send(m)
             return
         author = ' (' + str(message.author) + ')'
-        if (fdb['anonymous'] != 'off'):
+        if (fdb[str(message.guild.id)+'anonymous'] != 'off'):
             author = ''
         await message.channel.send(".say #ffa500" + str(message.author) +
                                    " : #c5f9f4 " + m)
@@ -1000,14 +1001,16 @@ async def on_message(message):
         sev = value
 
     elif message.content == ('!kill'):
-        if message.channel.name != fdb['dashboard']:
-            return
+        if message.channel.name != 'klee-dashboard':
+            if(message.guild.id not in HTRUSTED_SERVERS):
+              return
         else:
             await client.close()
             await message.add_reaction('✅')
     elif message.content == '!restart':
-        if message.channel.name != fdb['dashboard']:
-            return
+        if message.channel.name != 'klee-dashboard':
+            if (message.guild.id not in HTRUSTED_SERVERS):
+              return
         else:
             await message.add_reaction('✅')
             os.execv(sys.executable, ['python'] + sys.argv)
@@ -1016,7 +1019,7 @@ async def on_message(message):
             'https://cdn.discordapp.com/attachments/815610760205565952/817041086190977064/ezgif-2-49a8333fb4f2.gif'
         )
     elif message.content == '!server':
-        if message.channel.name != fdb['dashboard']:
+        if message.channel.name != 'klee-dashboard':
             return
         else:
             owner = str(message.guild.owner)
@@ -1080,7 +1083,9 @@ async def on_message(message):
             return
         return
     elif message.content.startswith("!forgetall*"):
-        if (message.channel.name != fdb['dashboard']):
+        if(message.guild.id not in HTRUSTED_SERVERS):
+            return
+        if (message.channel.name != 'klee-dashboard'):
             return
         for key in fdb.keys():
             del fdb[key]
@@ -1165,7 +1170,7 @@ async def on_message(message):
                             color=int("0x" + rgb, 16))
         await message.channel.send(embed=rgb)
     elif message.content.startswith('!spam'):
-        if (fdb["spam"] == "off"):
+        if (fdb[str(message.guild.id)+"spam"] == "off"):
             return
         l = " "
         word = message.content.split(' ', 2)[2]
@@ -1179,10 +1184,10 @@ async def on_message(message):
                 return
             await message.channel.send(word + l)
     elif ms.startswith('!ping '):
-        if (fdb["ping"] == "off"):
+        if (fdb[str(message.guild.id)+"ping"] == "off"):
             return
         if (message.channel.name == 'ig-team-chat'
-                and fdb['team-ping'] == 'off'):
+                and fdb[str(message.guild.id)+'team-ping'] == 'off'):
             if (ms.content != message.content):
                 return
         target = ''
@@ -1308,12 +1313,12 @@ async def on_message(message):
         curse.close()
     elif message.content.startswith('!remove-curse'):
         if (not discord.utils.get(message.guild.roles, name="Exorcist")
-                in message.author.roles):
+                in message.author.roles and not is_head(message)):
             return
-        curse = open('curse.txt', 'r+')
+        curse = open(str(message.guild.id)+'curse.txt', 'r+')
         target = get_id(message.content.split(' ')[1])
         if (target == 'all'):
-            curse = open('curse.txt', 'w')
+            curse = open(str(message.guild.id)+'curse.txt', 'w')
             curse.close()
             await message.channel.send("all curses have been removed")
             return
@@ -1323,7 +1328,7 @@ async def on_message(message):
                 continue
             output = output + l
         curse.close()
-        curse = open('curse.txt', 'w')
+        curse = open(str(message.guild.id)+'curse.txt', 'w')
         curse.write(output)
         await message.channel.send("The curse has been removed successfully")
         curse.close()
@@ -1340,14 +1345,17 @@ async def on_message(message):
     elif ms.startswith('!play'):  #Command for MEE6 no need to report it
         return
     elif message.content == '!settings':
-        if message.channel.name != fdb['dashboard']:
+        if message.channel.name != 'klee-dashboard':
             await message.channel.send(
                 "You do not have permission to use this command")
             return
         listo = ""
         for key in kw:
-            value = str(fdb[key])
-            listo = listo + key + " : " + value + os.linesep
+          if key in htp:
+              if (message.guild.id not in HTRUSTED_SERVERS):
+                      continue
+          value = str(fdb[key])
+          listo = listo + key + " : " + value + os.linesep
         info = discord.Embed(title="Bot Settings",
                              description=listo,
                              color=int("0x" + "E67E22", 16))
@@ -1359,10 +1367,14 @@ async def on_message(message):
         input = message.content.split(' ', 2)
         if (input[1] not in kw):
             return
-        fdb[input[1]] = input[2]
+        if input[1] in htp:
+            if (message.guidl.id not in HTRUSTED_SERVERS):
+                return
         if (input[1] == 'status'):
             await client.change_presence(activity=discord.Game(
                 name=str(input[2])))
+            fdb['status'] = input[2]
+        fdb[str(message.guild.id) + input[1]] = input[2]
         await react(message,0)
     elif ms.startswith('!count'):
         threshold = int(ms.split(' ')[1])
@@ -1932,13 +1944,13 @@ async def on_reaction_remove(reaction, user):
 
 @client.event
 async def on_member_join(member):
-    tc = discord.utils.get(member.guild.channels,name=fdb['wm'])
+    tc = discord.utils.get(member.guild.channels,name=fdb[str(member.guild.id)+'wm'])
     await tc.send('Welcome to our server ' + member.mention)
 
 
 @client.event
 async def on_member_remove(member):
-    tc = discord.utils.get(member.guild.channels,name=fdb['wm'])
+    tc = discord.utils.get(member.guild.channels,name=fdb[str(member.guild.id)+'wm'])
     await tc.send('Bye bye ' + member.name + ', you will be missed.')
 keep_alive()
 client.run(os.getenv('TOKEN'))
