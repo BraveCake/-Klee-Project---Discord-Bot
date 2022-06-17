@@ -26,7 +26,7 @@ from forumTitles import ForumTitles
 fdb = Database()
 #fdb['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
 #fdb['quick-bot'] = 'true'
-htp=['statistics','quickl-bot','status','dashboard'] #high trust perks
+htp=['statistics','quick-bot','status','dashboard'] #high trust perks
 kw = [
     "spam", "ping", "team-ping", "wm", "anonymous", "status", 'apps_notifier','statistics',
     'team-auto','teamchat-commands','dashboard','quick-bot'
