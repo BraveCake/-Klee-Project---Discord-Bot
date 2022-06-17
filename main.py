@@ -576,7 +576,7 @@ async def on_message(message):
             await message.channel.send("please enter a valid vote data !cast vote_id your vote")
             return
         fdb.execute("INSERT INTO votes(id,voter_id,vote) VALUES (%s,%s,%s)",(int(voteData[1]),message.author.id,voteData[2].replace('•','')))
-        await react(message,1)
+        await react(message,0)
         channel_id = fdb.execute("SELECT channel_id FROM survery WHERE id=%s",[int(voteData[1])]).fetchone()[0]
         channel = client.get_channel(channel_id)
         resultMessage= await channel.fetch_message(int(voteData[1]))
@@ -1124,7 +1124,7 @@ async def on_message(message):
                 modifyRole(message,role,0)
             gulag.seek(f.tell() - 1, os.SEEK_SET)
             f.write('\n')
-        await react(message,1)
+        await react(message,0)
         rs = 0
     elif message.content.startswith('!profile'):
         target = id = None
