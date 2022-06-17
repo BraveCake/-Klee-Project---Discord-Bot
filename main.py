@@ -1909,7 +1909,7 @@ async def on_message(message):
             if ' ' in message.content:
                 verify = message.content.split(' ', 1)[1]
             say = ""
-            if message.channel.name == 'ig-team-chat' and verify != '+' and fdb['teamchat-commands']:
+            if message.channel.name == 'ig-team-chat' and verify != '+' and fdb[str(message.guild.id)+'team-commands']!='off':
                 say = ".say "
             await message.channel.send(say + str(fdb[ms]))
         except:
@@ -1917,7 +1917,8 @@ async def on_message(message):
         finally:
             return
     elif message.channel.name=='ig-team-chat' and fdb[
-            'team-auto'] != 'off' and message.author.bot == False:  #team-say, not the bot/webhook and the option enabled
+            str(message.guild.id)+'team-auto'] != 'off' and message.author.bot == False:  #team-say, not the bot/webhook and the option enabled
+        print('test')
         author = message.author.id
         profile = None
         try:
