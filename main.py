@@ -1242,18 +1242,7 @@ async def on_message(message):
                     else:
                         continue
                 for r in roles:
-                    r = r.rstrip(os.linesep)
-                    if (r == 'SO'):
-                        await user.add_roles(SO_R)
-                    if (r == 'TSO'):
-                        await user.add_roles(TSO_R)
-                    if (r == 'guest'):
-                        await user.add_roles(guest_R)
-                    if (r == 'EXSO'):
-                        await user.add_roles(EXSO_R)
-                    if (r == "HON"):
-                        await user.add_roles(HON_R)
-
+                    modifyRole(message,pid,discord.utils.get(message.guild.roles, name=r.strip().id),1)
             else:
                 output = output + prisoner
         gulag.close()
@@ -1367,11 +1356,14 @@ async def on_message(message):
                 "You do not have permission to use this command")
             return
         listo = ""
+        value = ''
         for key in kw:
           if key in htp:
               if (message.guild.id not in HTRUSTED_SERVERS):
                       continue
-          value=''
+              else:
+                  value = str(fdb[key])
+
           try:
             value = str(fdb[str(message.guild.id)+key])
           except:
@@ -1942,7 +1934,7 @@ async def on_message(message):
         async with lock:
           if (fdb[str(message.guild.id)+'anonymous'] != 'off'):
               author = ''
-          rank = '' 
+          rank = ''
           await message.channel.send(".say " + rank + profile['IG-name'] +
                                    " : #c5f9f4 " + message.content)
           await asyncio.sleep(3.5)
