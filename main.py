@@ -155,17 +155,21 @@ async def dynamic_roster(reaction, user):
 
 async def dynamic_help(reaction, user):
     if (reaction.message.author == client.user
-            and reaction.message.embeds[0].title == 'List of commands'
+            and reaction.message.embeds[0].title.startswith('List of commands')
             and user != client.user):
+        state = int(reaction.message.embeds[0].title[-1])-1
         result = reaction.message.embeds[0]
         with open('help2.txt', 'r') as h2:
             with open('help.txt', 'r') as h1:
-                if reaction.emoji == '➡️':
-                    result.description = h2.read()
-                    await reaction.message.edit(embed=result)
-                elif reaction.emoji == '⬅️':
-                    result.description = h1.read()
-                    await reaction.message.edit(embed=result)
+                with open('help3.txt','r') as h3:
+                    pages = [h1,h2,h3]
+                    if reaction.emoji == '➡️':
+                        result.description = pages[(state+1)%3].read()
+                        await reaction.message.edit(embed=result)
+                    elif reaction.emoji == '⬅️':
+                        state =3 if state==0 else state
+                        result.description = pages[(state-1)].read()
+                        await reaction.message.edit(embed=result)
 
 
 async def team_chat_mute(message):
@@ -832,7 +836,7 @@ async def on_message(message):
             "https://img-9gag-fun.9cache.com/photo/aR79LGM_460s.jpg")
     elif (message.content.startswith('!khelp')):
         helpf = open('help.txt', 'r')
-        helpl = discord.Embed(title="List of commands",
+        helpl = discord.Embed(title="List of commands 1",
                               description=helpf.read(),
                               color=int("0x" + "FFD700", 16))
         helpf.close()
