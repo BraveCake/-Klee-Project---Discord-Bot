@@ -57,16 +57,27 @@
 
 !translate *langauge code* text : Translates the text of any language to English, the detection of the text language is done automatically so you don't have to worry about that, notice the translation is not accuarte by 100% but it works! if no language code is given *en* is the default one important note language code should be preceded and followed by the special character * 
 
+!vote topic type=type: use it to start a vote the default type is yes/no which is used when no type is given there're two other types which is numeric type and anonymous type. here's an example of how to start a an anonymous vote !vote klee is the best bot type=anonymous, for numeric votes replace anonymous word with a number like 5 (threshold is 9) e.g !vote rate klee from 0 to 9 type=9
+
 !kunmute @user: Reverts the effect of the previous command.
 
 !unwarn @user : removes all warning points of a user.
 
 !write text : special command introduces you to some of klee's hidden talents
 
+the following 4 commands can be used to get info about the players amount in cit !players !law !criminals !civilians
+
 !reqtitle forum_user_id title: modifies/adds you a custom title if you're using our custom forum extension
+
+!notify player_name: Klee will notify you when certain player logs into the game note (the name matching is not very accurate)
+
+!unnotify player_name: this command cancels your subscription in notify service, please make sure to enter exactly the same name used with !notify command
+
 !average : shows the average amount of messages sent in teamchat today
+
+!op @user : gives the mentioned user read & message access to all server channels.(Can only be used by administrator)
 
 !extensions : use it to view our unique extensions (discord & forum extension are there)
 __ Most Recent updates __
-** Klee's developer support might be dropped permanently**
+**Klee not longer receive the same amount of the support/regular updates from the developer**
 

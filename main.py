@@ -54,7 +54,7 @@ async def teamStatistics(message):
       details= [0]*24
       yesterday =datetime.now()
       yesterday = yesterday - timedelta(hours=yesterday.hour,minutes=yesterday.minute,seconds=yesterday.second)
-      tc = discord.utils.get(message.guild.channels,name='team-chat')
+      tc = discord.utils.get(message.guild.channels,name='ig-team-chat')
       first = ''
       async for msg in tc.history(limit=None,after=yesterday):
            if(first==''):
@@ -1382,7 +1382,7 @@ async def on_message(message):
         if (input[1] not in kw):
             return
         if input[1] in htp:
-            if (message.guidl.id not in HTRUSTED_SERVERS):
+            if (message.guild.id not in HTRUSTED_SERVERS):
                 return
         if (input[1] == 'status'):
             await client.change_presence(activity=discord.Game(
@@ -1910,7 +1910,7 @@ async def on_message(message):
         finally:
             return
     elif message.channel.name=='ig-team-chat' and fdb[
-            'team-auto'] != 'off' and message.author.bot != True:  #team-say, not the bot/webhook and the option enabled
+            'team-auto'] != 'off' and message.author.bot == False:  #team-say, not the bot/webhook and the option enabled
         author = message.author.id
         profile = None
         try:
@@ -1932,7 +1932,7 @@ async def on_message(message):
             await team_chat_mute(message)
             return
         async with lock:
-          if (fdb['anonymous'] != 'off'):
+          if (fdb[str(message.guild.id)+'anonymous'] != 'off'):
               author = ''
           rank = '#ffffff'
           for r in SO_Roles:
