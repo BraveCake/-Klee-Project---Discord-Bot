@@ -30,6 +30,8 @@ kw = [
     "spam", "ping", "team-ping", "wm", "anonymous", "status", 'apps_notifier','statistics',
     'team-auto','teamchat-commands','dashboard','quick-bot'
 ]
+TRUSTED_SERVERS= [451993644644171776 #MAIN DISCORD
+    ,376647426334785557] #PC DISCORD
 intents = discord.Intents.default()
 intents.members = True
 client = discord.Client(intents=intents)
@@ -440,7 +442,10 @@ def rollDice(message):
     return random.randint(0, x - 1) + 1
 
 async def cursed(message):
-    curse = open(str(message.guild.id)+'curse.txt', 'r')
+    curseFile =str(message.guild.id)+'curse.txt'
+    if ( not os.path.exists(curseFile) ):
+        return
+    curse = open(curseFile, 'r')
     cm = 0
     try:
         for l in curse:
@@ -564,8 +569,9 @@ async def on_message(message):
         await resultMessage.edit(embed=resultBoard)
         return
 
-    if message.guild is None:
+    if (message.guild.id  not in TRUSTED_SERVERS):
         print("Detected an attempt to use me outside trusted Servers")
+        return
     def is_head(message):
         return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
