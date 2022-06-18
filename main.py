@@ -584,7 +584,7 @@ async def on_message(message):
         resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
         await resultMessage.edit(embed=resultBoard)
 
-    with open(str(message.guild.id)+('logs','a+')) as logs:
+    with open(str(message.guild.id)+'logs','a+') as logs:
         logs.write(message.content)
     def is_head(message):
         return message.author.guild_permissions.administrator
