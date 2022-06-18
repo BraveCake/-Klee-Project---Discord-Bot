@@ -1040,8 +1040,8 @@ async def on_message(message):
             'https://cdn.discordapp.com/attachments/815610760205565952/817041086190977064/ezgif-2-49a8333fb4f2.gif'
         )
     elif message.content =='!servers':
-        if (message.guild.id in HTRUSTED_SERVERS):
-            await message.channel.send("Klee is in "+str(len(list(client.guilds))) +" servers which are the following servers : "+ "".join(guild.name for guild in client.guilds))
+        if (message.guild.id in HTRUSTED_SERVERS and message.channel.name=='klee-dashboard'):
+            await message.channel.send("Klee is in "+str(len(list(client.guilds))) +" servers which are the following servers : "+ "-".join(guild.name for guild in client.guilds))
         else:
             return
     elif message.content == '!server':
