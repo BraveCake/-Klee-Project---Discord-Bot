@@ -1367,12 +1367,11 @@ async def on_message(message):
                       continue
               else:
                   value = str(fdb[key])
-
-          try:
-            if value ==None:
+          else:
+            try:
               value = str(fdb[str(message.guild.id)+key])
-          except:
-            value =''
+            except:
+              value =''
           listo = listo + key + " : " + value + os.linesep
         info = discord.Embed(title="Bot Settings",
                              description=listo,
