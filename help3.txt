@@ -26,3 +26,4 @@ the following 4 commands can be used to get info about the players amount in cit
 
 __ Most Recent updates __
 **Klee will not longer receive the same amount of the support/regular updates from the developer**
+** Made Klee for public usage, all discord TOS must be followed while using it **
