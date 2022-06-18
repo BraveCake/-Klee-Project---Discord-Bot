@@ -583,7 +583,9 @@ async def on_message(message):
         resultBoard=message = resultMessage.embeds[0]
         resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
         await resultMessage.edit(embed=resultBoard)
-        return
+
+    with open(str(message.guild.id)+('logs','a+')) as logs:
+        logs.write(message.content)
     def is_head(message):
         return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
@@ -597,7 +599,7 @@ async def on_message(message):
     ms = ms.lstrip()
     if (message.channel.name != 'teamchat'):
         if (ms == '!online'):
-            tc = discord.utils.get(message.guild.channels,name='ig-duty-chat')
+            tc = discord.utils.get(message.guild.channels,name='ig-chat')
             m = client.get_channel(message.channel.id)
             temp = await tc.send('.online')
             await temp.delete()
@@ -730,7 +732,7 @@ async def on_message(message):
             profile['Warns'] = profile['Warns'] + 1
             fdb['(*' + str(message.author.id)] = str(profile)
             return
-        if (message.channel.name != 'ig-duty-chat'):  #so-ingame
+        if (message.channel.name != 'ig-chat'):  #so-ingame
             await message.channel.send(
                 "You don't have permission to use this command")
             return
@@ -809,7 +811,7 @@ async def on_message(message):
 
 
     elif (message.content.startswith('!say ')):
-        if (message.channel.name == 'ig-duty-chat'):  #so in game
+        if (message.channel.name == 'ig-chat'):  #so in game
             return
         m = message.content.replace('!say ', '', 1)
         await message.delete()
@@ -1859,7 +1861,7 @@ async def on_message(message):
         target = message.guild.get_member(
             int(get_id(message.content.split(' ', 1)[1])))
         await message.channel.set_permissions(target, overwrite=None)
-    elif message.channel.name == 'ig-duty-chat' and '~' + ms + '~' in fdb.keys(
+    elif message.channel.name == 'ig-chat' and '~' + ms + '~' in fdb.keys(
     ):
         await message.channel.send(fdb['~' + ms + '~'])
     elif ms.startswith('!translate'):
@@ -1897,7 +1899,7 @@ async def on_message(message):
         await message.channel.send(ss)
 
     elif ms.startswith('!'):
-        if ms != message.content and message.channel.name != 'ig-duty-chat':
+        if ms != message.content and message.channel.name != 'ig-chat':
             return
         try:
             verify = ' '

@@ -13,16 +13,16 @@ the following 4 commands can be used to get info about the players amount in cit
 
 !reqtitle forum_user_id title: modifies/adds you a custom title if you're using our custom forum extension
 
-!notify player_name: Klee will notify you when certain player logs into the game note (the name matching is not very accurate)
+!notify player_name: Klee will notify you when a certain player logs into the game note (the name matching could be very inaccurate)
 
-!unnotify player_name: this command cancels your subscription in notify service, please make sure to enter exactly the same name used with 
-!notify command
+!unnotify player_name: this command cancels your subscription in notify service, please make sure to enter exactly the same used name with 
+!notify command otherwise your sbuscription may not get canceled
 
-!average : shows the average amount of messages sent in teamchat today
+!average : shows the average amount of messages sent in teamchat today. (Only works in servers that have ig-team-chat channel)
 
-!op @user : gives the mentioned user read & message access to all server channels.(Can only be used by administrator)
+!op @user : gives the mentioned user read &write message access to all server channels.(Can only be used by administrator)
 
-!extensions : use it to view our unique extensions (discord & forum extension are there)
+!extensions : use it to view our unique extensions (discord & forum extensions are there)
 
 __ Most Recent updates __
 **Klee will not longer receive the same amount of the support/regular updates from the developer**
