@@ -584,10 +584,6 @@ async def on_message(message):
         resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
         await resultMessage.edit(embed=resultBoard)
         return
-
-    if (message.guild.id  not in TRUSTED_SERVERS):
-        print("Detected an attempt to use me outside trusted Servers")
-        return
     def is_head(message):
         return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
@@ -619,6 +615,8 @@ async def on_message(message):
                     return
     #fdb['dashboard'] = dashboard
     if (message.content.startswith('!logs')):
+        if(message.guild.id not in HTRUSTED_SERVERS):
+            return
         if (message.channel.id != int(fdb[str(message.guild.id)+'dashboard'])):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
@@ -660,6 +658,8 @@ async def on_message(message):
         await message.channel.send(output)
         limiter = False
     elif (message.content.startswith('!lines')):
+        if (message.guild.id not in HTRUSTED_SERVERS):
+            return
         if (message.channel.id != int(fdb[str(message.guild.id)+'dashboard'])):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
@@ -1358,7 +1358,7 @@ async def on_message(message):
                 "You do not have permission to use this command")
             return
         listo = ""
-        value = ''
+        value = None
         for key in kw:
           if key in htp:
               if (message.guild.id not in HTRUSTED_SERVERS):
@@ -1367,7 +1367,8 @@ async def on_message(message):
                   value = str(fdb[key])
 
           try:
-            value = str(fdb[str(message.guild.id)+key])
+            if value ==None:
+              value = str(fdb[str(message.guild.id)+key])
           except:
             value =''
           listo = listo + key + " : " + value + os.linesep
