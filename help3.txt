@@ -22,6 +22,8 @@ the following 4 commands can be used to get info about the players amount in cit
 
 !op @user : gives the mentioned user read &write message access to all server channels.(Can only be used by administrator)
 
+!server : gives a report about the current server Note ( it can only be used in "klee-dashboard" channel)
+
 !extensions : use it to view our unique extensions (discord & forum extensions are there)
 
 __ Most Recent updates __
