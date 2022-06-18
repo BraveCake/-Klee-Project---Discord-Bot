@@ -1041,7 +1041,7 @@ async def on_message(message):
         )
     elif message.content =='!servers':
         if (message.guild.id in HTRUSTED_SERVERS and message.channel.name=='klee-dashboard'):
-            await message.channel.send("Klee is in "+str(len(list(client.guilds))) +" servers which are the following servers : "+ "-".join(guild.name for guild in client.guilds))
+            await message.channel.send("Klee is in "+str(len(list(client.guilds))) +" servers which are the following servers : "+ "\n".join(guild.name for guild in client.guilds))
         else:
             return
     elif message.content == '!server':
