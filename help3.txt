@@ -1,12 +1,12 @@
-!kmute @user : Prevents the mentioned user from sending any message in the channel which the command was used in. **Note this command can only used by administrators, HSO role users or AHSO role users**
+!kmute @user : Prevents the mentioned user from sending any message in the channel which the command was used in. **Note this command can only used by administrators**
 
 !translate *langauge code* text : Translates the text of any language to English, the detection of the text language is done automatically so you don't have to worry about that, notice the translation is not accuarte by 100% but it works! if no language code is given *en* is the default one important note language code should be preceded and followed by the special character * 
 
 !vote topic type=type: use it to start a vote the default type is yes/no which is used when no type is given there're two other types which is numeric type and anonymous type. here's an example of how to start a an anonymous vote !vote klee is the best bot type=anonymous, for numeric votes replace anonymous word with a number like 5 (threshold is 9) e.g !vote rate klee from 0 to 9 type=9
 
-!kunmute @user: Reverts the effect of the previous command.
+!kunmute @user: Reverts the effect of the previous command (Only accessed by an administrator).
 
-!unwarn @user : removes all warning points of a user.
+!unwarn @user : removes all warning points of a user (Only accessed by an administrator).
 
 !write text : special command introduces you to some of klee's hidden talents
 the following 4 commands can be used to get info about the players amount in cit !players !law !criminals !civilians
@@ -27,5 +27,7 @@ the following 4 commands can be used to get info about the players amount in cit
 !extensions : use it to view our unique extensions (discord & forum extensions are there)
 
 __ Most Recent updates __
-**Klee will not longer receive the same amount of the support/regular updates from the developer**
-** Made Klee for public usage, all discord TOS must be followed while using it **
+--**Klee will not longer receive the same amount of the support/regular updates from the developer**
+--** Made Klee for public usage, all discord TOS must be followed while using it **
+--** All previously stored data through !learn command were deleted, any new learnt information through !learn command will be server dependednt (means it will be exclusive and not shared anymore through a global !dictionary) this update was added due to IRRESPONSIBLE INDIVIDUALS who were using it to fight and overwrote existing words solely for personal disputes.
+Kindly be mature while using klee also we want to celebrate reaching 8 unique servers 🎉 **
