@@ -1083,22 +1083,22 @@ async def on_message(message):
         await message.add_reaction('✅')
     elif ms.startswith('!learn '):
         if ms.startswith('(*'):
+            print('someone trying to do shit')
             return
         key = ''
         value = ''
-        try:
-            key = '!' +str(message.guild.id)+ ms.split(' ', 2)[1]
-            if (key in kw):
-                return
-            value = ms.split(' ', 2)[2]
-        except:
-            print('exception in learning block')
+        key = '!' +str(message.guild.id)+ ms.split(' ',2)[1]
+        if (key in kw):
+            print('someone trying to do shit')
             return
+        if (ms.count(' ')<2):
+            await message.channel.send("please use !learn in the following format !learn key_word information")
+            return
+        value = ms.split(' ', 2)[2]
         if (key == ''):
             return
         fdb[key] = value
         await react(message,0)
-        return
     elif message.content.startswith('!forget'):
         try:
             key = '!' +str(message.guild.id)+ message.content.split(' ')[1]
