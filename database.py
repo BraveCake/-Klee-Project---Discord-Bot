@@ -9,7 +9,7 @@ class Database():
     Database.me.autocommit = True
     self.fdb= Database.me.cursor()
     Database.me.commit()
-  def __delitem__(self,index):
+  def __delitem__(self,key):
     self.fdb.execute("DELETE FROM main WHERE key=%s",(key,))
   def __getitem__(self, key):
     try:
