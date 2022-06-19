@@ -1070,7 +1070,9 @@ async def on_message(message):
     elif message.content.startswith('!dictionary'):
       keys=''
       for key in fdb.keys():
-         if(key.startswith('!')):
+         if(key.startswith('!')+str(message.guild.id)):
+            if(message.guild.id not in HTRUSTED_SERVERS):
+              return
             keys = keys+"\n"+key
       parts = split_message(keys)
       for part in parts:
@@ -1079,7 +1081,7 @@ async def on_message(message):
         key = ms.split(' ', 1)[1].split('.',1) if ms.find('.')!=-1 else ms.split(' ',1)[1].split(' ')
         if (key[0] in kw or key[0].startswith('!')):
             return
-        fdb['~' + key[0] + '~'] = key[1]
+        fdb['~' + str(message.guild.id)+key[0] + '~'] = key[1]
         await message.add_reaction('✅')
     elif ms.startswith('!learn '):
         if ms.startswith('(*'):
@@ -1087,7 +1089,7 @@ async def on_message(message):
         key = ''
         value = ''
         try:
-            key = '!' + ms.split(' ', 2)[1]
+            key = '!' +str(message.guild.id)+ ms.split(' ', 2)[1]
             if (key in kw):
                 return
             value = ms.split(' ', 2)[2]
@@ -1096,14 +1098,14 @@ async def on_message(message):
             return
         if (key == ''):
             return
-        fdb[key] = value
+        fdb[str(message.guild.id)+key] = value
         await react(message,0)
         return
     elif message.content.startswith('!forget'):
         try:
-            key = '!' + message.content.split(' ')[1]
+            key = '!' +str(message.guild.id)+ message.content.split(' ')[1]
             if (message.content.startswith('!forget+')):
-                key = '~' + key + '~'
+                key = '~' +str(message.guild.id)+ key + '~'
             del fdb[key]
         finally:
             await react(message,0)
@@ -1913,6 +1915,8 @@ async def on_message(message):
             say = ""
             if message.channel.name == 'ig-team-chat' and verify != '+' and fdb[str(message.guild.id)+'team-commands']!='off':
                 say = ".say "
+            key = ms.split('!')[1]
+            key = "!"+str(message.guild.id)+key
             await message.channel.send(say + str(fdb[ms]))
         except:
             print('reporting unexisting entity ' + ms)
