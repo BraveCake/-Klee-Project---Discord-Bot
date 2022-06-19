@@ -1070,7 +1070,7 @@ async def on_message(message):
     elif message.content.startswith('!dictionary'):
       keys=''
       for key in fdb.keys():
-         if(key.startswith('!')+str(message.guild.id)):
+         if(key.startswith('!'+str(message.guild.id))):
             keys = keys+"\n"+key
       parts = split_message(keys)
       for part in parts:
@@ -1902,7 +1902,9 @@ async def on_message(message):
                     str(message.author.id) + ',', '')
                 ss = "You have removed your subscription successfully"
         await message.channel.send(ss)
-
+    elif message.content =='!extensions':
+        with open('extensions.txt','r') as extensions:
+            await message.channel.send(extensions.read())
     elif ms.startswith('!'):
         if ms != message.content and message.channel.name != 'ig-chat':
             return
