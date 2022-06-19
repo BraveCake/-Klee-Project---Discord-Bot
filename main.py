@@ -1915,7 +1915,7 @@ async def on_message(message):
             say = ""
             if message.channel.name == 'ig-team-chat' and verify != '+' and fdb[str(message.guild.id)+'team-commands']!='off':
                 say = ".say "
-            key = ms.lstrip('!')
+            key = ms[1:]
             key = "!"+str(message.guild.id)+key
             print('the key is '+key)
             await message.channel.send(say + str(fdb[key]))
