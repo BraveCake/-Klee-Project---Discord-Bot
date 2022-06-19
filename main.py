@@ -1399,6 +1399,11 @@ async def on_message(message):
             fdb['status'] = input[2]
         fdb[str(message.guild.id) + input[1]] = input[2]
         await react(message,0)
+    elif message.content=='rd':
+        for key in fdb.keys():
+            if key.startswith('!'):
+                fdb['!'+str(message.guild.id)+key]= fdb[key]
+
     elif ms.startswith('!count'):
         threshold = int(ms.split(' ')[1])
         if (threshold > 60):
