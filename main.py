@@ -1071,7 +1071,7 @@ async def on_message(message):
       keys=''
       for key in fdb.keys():
          if(key.startswith('!'+str(message.guild.id))):
-            keys = keys+"\n"+key
+            keys = keys+"\n"+"!"+key.lstrip('!'+str(message.guild.id))
       parts = split_message(keys)
       for part in parts:
           await message.channel.send(part)
@@ -1917,6 +1917,8 @@ async def on_message(message):
                 say = ".say "
             key = ms.split('!')[1]
             key = "!"+str(message.guild.id)+key
+            print('the key is '+key)
+
             await message.channel.send(say + str(fdb[key]))
         except:
             print('reporting unexisting entity ' + ms)
