@@ -1348,11 +1348,11 @@ async def on_message(message):
         curse.write(output)
         await message.channel.send("The curse has been removed successfully")
         curse.close()
-    elif message.content.startswith('!changerole '):
+    elif message.content.startswith('!change-role '):
         if(not is_head(message)):
             return
         info= message.content.split(' ',1)[1]
-        old_role,new_role= info.split(' : ')
+        old_role,new_role= map(lambda role: role.strip(),info.split(':',1))
         for member in message.guild.members:
             if ( old_role in [role.name for role in member.roles]):
                 await modifyRole(message, member.id, old_role, 0)

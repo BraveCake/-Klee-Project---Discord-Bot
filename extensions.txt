@@ -1,0 +1,10 @@
+**Customizable discord with custom emojis support to non nitrous users extension:**
+https://cdn.discordapp.com/attachments/464028850091851786/933447171250995240/message.txt
+**Dark CIT Custom extension with support to external custom emojis (added custom titles it's a beta feature):** 
+https://cdn.discordapp.com/attachments/810213552912203827/970514500505722971/message.txt
+Make sure you download Tampermonkey extension to be able to run any of the extensions above.
+Link:(https://chrome.google.com/webstore/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo?hl=en)
+
+View:
+Discord: https://media.discordapp.net/attachments/691199564262146061/895174643059675156/unknown.png?width=1121&height=628
+CIT: https://media.discordapp.net/attachments/691199564262146061/895174800002134017/unknown.png?width=1098&height=628

@@ -17,7 +17,7 @@
 
 !rename *user* *new name* : Rename a user use value *none to remove any existing nick (Only administrators)
 
-!banTrials : ban all filthy trials
+!change-role oldRole : newRole : replaces an old with a new existing role for all server members. example !change-role Noob : Pro 
 
 !count *value* : make klee count from 1 to the specified value
 
