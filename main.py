@@ -1096,6 +1096,7 @@ async def on_message(message):
             return
         value = ms.split(' ', 2)[2]
         if (key == ''):
+            print('no key')
             return
         fdb[key] = value
         await react(message,0)
