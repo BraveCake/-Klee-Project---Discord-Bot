@@ -1096,7 +1096,7 @@ async def on_message(message):
             return
         if (key == ''):
             return
-        fdb[str(message.guild.id)+key] = value
+        fdb[key] = value
         await react(message,0)
         return
     elif message.content.startswith('!forget'):
