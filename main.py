@@ -1402,7 +1402,8 @@ async def on_message(message):
     elif message.content=='rd':
         for key in fdb.keys():
             if key.startswith('!'):
-                fdb['!'+str(message.guild.id)+key]= fdb[key]
+                fdb['!'+str(message.guild.id)+key[1:]]= fdb[key]
+                del fdb[key]
 
     elif ms.startswith('!count'):
         threshold = int(ms.split(' ')[1])
