@@ -8,3 +8,4 @@ urllib3
 flask
 psycopg2
 firebase-admin
+html2image
