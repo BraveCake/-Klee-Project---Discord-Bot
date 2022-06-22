@@ -562,7 +562,7 @@ lock = asyncio.Lock()
 
 @client.event
 async def on_message(message):
-    print(message.content + " from id:" + str(message.author.id))
+    print(message.content + " from author:" + message.author.name+" id:"+message.author.id)
     
     global m, sev, limiter, kw, so_roster,cancel
     ch = await cursed(message)
@@ -586,11 +586,6 @@ async def on_message(message):
         resultBoard=message = resultMessage.embeds[0]
         resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
         await resultMessage.edit(embed=resultBoard)
-    if message.guild.id not in HTRUSTED_SERVERS:
-        logs = open(str(message.guild.id)+'logs.txt','a+')
-        print('writing')
-        logs.write(message.content)
-        logs.close()
     def is_head(message):
         return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
