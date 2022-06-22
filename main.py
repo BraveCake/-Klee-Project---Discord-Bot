@@ -41,7 +41,7 @@ intents.members = True
 client = discord.Client(intents=intents)
 def intializeSettings(id):
     counter =0
-    defaultValues = ['on','on','off','','off','on','on','off']
+    defaultValues = ['on','on','off','','off','on','on','off','ig-team-chat']
     for key in kw:
         if(key in htp):
             continue
