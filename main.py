@@ -1431,8 +1431,8 @@ async def on_message(message):
         result = connect2forum(url)
         result = BeautifulSoup(result, 'html.parser')
         for quote in result.find_all('blockquote'):
-            print(quote)
-            quote.string.replace_with("«" + quote.text+'»\n')
+            print(quote.strings)
+            quote.strings.replace_with("«" + quote.text+'»\n')
         result = result.get_text().replace("""Hey, Klee
 Show unread posts since last visit.
 Show new replies to your posts.""",'',1)
