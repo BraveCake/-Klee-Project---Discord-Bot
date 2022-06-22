@@ -1429,6 +1429,7 @@ async def on_message(message):
     elif message.content.startswith('!vf '):
         url = message.content.split(' ', 1)[1]
         result = connect2forum(url)
+        result = BeautifulSoup(result ,'html.parser').get_text()
         buffer = StringIO(result)
         f = discord.File(buffer, filename="forum.txt")
         await message.channel.send(file=f)
