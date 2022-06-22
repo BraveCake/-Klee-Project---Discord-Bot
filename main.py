@@ -1937,8 +1937,7 @@ Show new replies to your posts.""",'',1)
             print('reporting unexisting entity ' + ms)
         finally:
             return
-    elif message.channel.name==fdb[str(message.guild.id)+'ig-team-chat'] and fdb[
-            str(message.guild.id)+'team-auto'] != 'off' and message.author.bot == False:  #team-say, not the bot/webhook and the option enabled
+    elif message.channel.name==fdb[str(message.guild.id)+'ig-team-chat'] and fdb[str(message.guild.id)+'team-auto'] != 'off' and message.author.bot == False:  #team-say, not the bot/webhook and the option enabled
         print('test')
         author = message.author.id
         profile = None
