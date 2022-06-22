@@ -1425,7 +1425,7 @@ async def on_message(message):
         if info[2].lower() == '*none':
             info[2] = None
         await target.edit(nick=info[2])
-    elif message.contet.startswith('!vf '):
+    elif message.content.startswith('!vf '):
         hti = Html2Image()
         args = message.content.split(' ', 1)[1:3]
         result = connect2forum(args[1])
