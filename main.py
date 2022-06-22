@@ -21,7 +21,7 @@ from PIL import ImageFont
 import pytube
 from database import Database
 from forumTitles import ForumTitles
-from html2image import HtmlToImage
+from html2image import Html2Image
 
 fdb = Database()
 #fdb['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
@@ -1426,7 +1426,7 @@ async def on_message(message):
             info[2] = None
         await target.edit(nick=info[2])
     elif message.contet.startswith('!vf '):
-        hti = HtmlToImage()
+        hti = Html2Image()
         args = message.content.split(' ', 1)[1:3]
         result = connect2forum(args[1])
         hti.screenshot(html_str=result,save_as='forum.png')
