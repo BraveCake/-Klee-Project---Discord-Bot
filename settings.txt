@@ -1,3 +1,5 @@
+use !settings option_name value  to modify the bot settings
+
 spam:set it to off to disable !spam command on otherwise
 
 ping: set it to off to disable !ping command on otherwise
@@ -13,6 +15,8 @@ statistics: channel name of statistics service klee will post the total messages
 team-auto: .say command is not needed to send messages in team chat when it's on
 
 teamchat-commands : klee's learnt commands via !learn won't work in team chat when it's off mainly exist to prevent spam/abuse
+
+ig-team-chat: the name of the team chat channel if you have any without setting this option any command/feature related to it like !lines or !average won't work properly
 
 
 

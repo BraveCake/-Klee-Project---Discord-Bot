@@ -45,7 +45,7 @@
 
 !sm @user amount: Send a specific amount of money to another user
 
-!lottery Ticket_number_between_1 & 20: Buy a ticket to participate at the lottery the ticket costs 50$ you can only buy a single one daily the prize of the lottery is 50k.
+!lottery Ticket_number_between_1 & 10: Buy a ticket to participate at the lottery the ticket costs 50$ you can only buy a single one hourly the prize of the lottery is 50k if you win you will get a private message from klee notifying you that you're the lucky winner.
 
 !hot @user amount: Challenge someone in coin flipping, it's basically a gambling.
 

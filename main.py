@@ -587,9 +587,10 @@ async def on_message(message):
         resultBoard.description = resultBoard.description +"\n•Vote:"+voteData[2]+"\n\n"
         await resultMessage.edit(embed=resultBoard)
     if message.guild.id not in HTRUSTED_SERVERS:
-        with open(str(message.guild.id)+'logs.txt','a+') as logs:
-            print('writting')
-            logs.write(message.content)
+        logs = open(str(message.guild.id)+'logs.txt','a+')
+        print('writing')
+        logs.write(message.content)
+        logs.close()
     def is_head(message):
         return message.author.guild_permissions.administrator
    # response = requests.get("http://jarno.pro/stuff/api/ab.php")
