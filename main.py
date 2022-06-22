@@ -21,7 +21,7 @@ from PIL import ImageFont
 import pytube
 from database import Database
 from forumTitles import ForumTitles
-
+from html2image import HtmlToImage
 
 fdb = Database()
 #fdb['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
@@ -1425,6 +1425,20 @@ async def on_message(message):
         if info[2].lower() == '*none':
             info[2] = None
         await target.edit(nick=info[2])
+    elif message.contet.startswith('!vf '):
+        htmi = HtmlToImage()
+        args = message.content.split(' ', 1)[1:3]
+        result = connect2forum(args[1])
+        hti.screenshot(html_str=result,save_as='forum.png')
+        if(len(args)>2):
+            if(args[1] not in ['txt','text']):
+                with open('forum.png', 'rb') as f:
+                    img = discord.File(f)
+                    await message.channel.send(file=f)
+                    return
+        await message.channel.send(result)
+
+        message.channel.send()
     elif ms.startswith('!convert'):
         url = message.content.split(' ',1)[1] 
         temp_file=pytube.YouTube(url).streams.filter(only_audio=True).first().download()
