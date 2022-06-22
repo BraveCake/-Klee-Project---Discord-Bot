@@ -30,7 +30,7 @@ fdb = Database()
 htp=['statistics','quick-bot','status','dashboard'] #high trust perks
 kw = [
     "spam", "ping", "team-ping", "wm", "anonymous", "status", 'apps_notifier','statistics',
-    'team-auto','teamchat-commands','dashboard','quick-bot'
+    'team-auto','teamchat-commands','dashboard','quick-bot','ig-team-chat'
 ]
 HTRUSTED_SERVERS = [451993644644171776]
 TRUSTED_SERVERS= [451993644644171776 #MAIN DISCORD
@@ -55,7 +55,7 @@ async def teamStatistics(message):
       details= [0]*24
       yesterday =datetime.now()
       yesterday = yesterday - timedelta(hours=yesterday.hour,minutes=yesterday.minute,seconds=yesterday.second)
-      tc = discord.utils.get(message.guild.channels,name='ig-team-chat')
+      tc = discord.utils.get(message.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
       first = ''
       async for msg in tc.history(limit=None,after=yesterday):
            if(first==''):
@@ -643,7 +643,7 @@ async def on_message(message):
         target = message.content.split(' ', 2)[1]
         if (not message.content.startswith('!logs+')):
             target = message.content.split(' ', 2)[1].lower()
-        tc = discord.utils.get(member.guild.channels,name='ig-team-chat')
+        tc = discord.utils.get(member.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
         delm = await message.channel.send('Gathering data...')
         async for msg in tc.history(limit=None, after=sp):
             if(cancel == True):
@@ -696,7 +696,7 @@ async def on_message(message):
         for t in target:
             t = t.strip()
             f = open(t + ' ' + date_str + '.txt', 'w+')
-            tc = discord.utils.get(member.guild.channels,name='ig-team-chat')
+            tc = discord.utils.get(member.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
             # 462841576616361987
             delm = await message.channel.send('Gathering data...')
             async for msg in tc.history(limit=None, after=sp):
@@ -727,7 +727,7 @@ async def on_message(message):
         limiter = False
 
     elif (message.content.startswith('.say ')):
-        if (message.channel.name == 'ig-team-chat'):  #team-chat
+        if (message.channel.name == fdb[str(message.guild.id)+'ig-team-chat']):  #team-chat
             await message.channel.send(
                 'You have received a one warning point for using .say command here once your points exceed 2 you will lose your access to this channel the warning points are reset daily but the access cannot be reteived without intervention'
             )
@@ -821,7 +821,7 @@ async def on_message(message):
             return
         m = message.content.replace('!say ', '', 1)
         await message.delete()
-        if (message.channel.id != 'ig-team-chat'):
+        if (message.channel.id != fdb[str(message.guild.id)+'ig-team-chat']):
             await message.channel.send(m)
             return
         author = ' (' + str(message.author) + ')'
@@ -1219,7 +1219,7 @@ async def on_message(message):
     elif ms.startswith('!ping '):
         if (fdb[str(message.guild.id)+"ping"] == "off"):
             return
-        if (message.channel.name == 'ig-team-chat'
+        if (message.channel.name == fdb[str(message.guild.id)+'ig-team-chat']
                 and fdb[str(message.guild.id)+'team-ping'] == 'off'):
             if (ms.content != message.content):
                 return
@@ -1931,7 +1931,7 @@ Show new replies to your posts.""",'',1)
             if ' ' in message.content:
                 verify = message.content.split(' ', 1)[1]
             say = ""
-            if message.channel.name == 'ig-team-chat' and verify != '+' and fdb[str(message.guild.id)+'team-commands']!='off':
+            if message.channel.name == fdb[str(message.guild.id)+'ig-team-chat'] and verify != '+' and fdb[str(message.guild.id)+'team-commands']!='off':
                 say = ".say "
             key = ms[1:]
             key = "!"+str(message.guild.id)+key
@@ -1941,7 +1941,7 @@ Show new replies to your posts.""",'',1)
             print('reporting unexisting entity ' + ms)
         finally:
             return
-    elif message.channel.name=='ig-team-chat' and fdb[
+    elif message.channel.name==fdb[str(message.guild.id)+'ig-team-chat'] and fdb[
             str(message.guild.id)+'team-auto'] != 'off' and message.author.bot == False:  #team-say, not the bot/webhook and the option enabled
         print('test')
         author = message.author.id
