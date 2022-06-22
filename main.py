@@ -1440,8 +1440,6 @@ Show new replies to your posts.""",'',1)
         buffer = StringIO(result)
         f = discord.File(buffer, filename="forum.txt")
         await message.channel.send(file=f)
-
-        message.channel.send()
     elif ms.startswith('!convert'):
         url = message.content.split(' ',1)[1] 
         temp_file=pytube.YouTube(url).streams.filter(only_audio=True).first().download()
