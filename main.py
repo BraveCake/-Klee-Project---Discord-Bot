@@ -562,7 +562,7 @@ lock = asyncio.Lock()
 
 @client.event
 async def on_message(message):
-    print(message.content + " from author:" + message.author.name+" id:"+message.author.id)
+    print(message.content + " from author:" + message.author.name+" id:"+str(message.author.id))
     
     global m, sev, limiter, kw, so_roster,cancel
     ch = await cursed(message)
