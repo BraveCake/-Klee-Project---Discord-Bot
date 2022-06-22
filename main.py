@@ -643,7 +643,7 @@ async def on_message(message):
         target = message.content.split(' ', 2)[1]
         if (not message.content.startswith('!logs+')):
             target = message.content.split(' ', 2)[1].lower()
-        tc = discord.utils.get(member.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
+        tc = discord.utils.get(message.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
         delm = await message.channel.send('Gathering data...')
         async for msg in tc.history(limit=None, after=sp):
             if(cancel == True):
@@ -696,7 +696,7 @@ async def on_message(message):
         for t in target:
             t = t.strip()
             f = open(t + ' ' + date_str + '.txt', 'w+')
-            tc = discord.utils.get(member.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
+            tc = discord.utils.get(message.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
             # 462841576616361987
             delm = await message.channel.send('Gathering data...')
             async for msg in tc.history(limit=None, after=sp):
