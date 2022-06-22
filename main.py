@@ -723,7 +723,7 @@ async def on_message(message):
         limiter = False
 
     elif (message.content.startswith('.say ')):
-        if (message.channel.name == fdb[str(message.guild.id)+'ig-team-chat']):  #team-chat
+        if (message.channel.name == fdb[str(message.guild.id)+'ig-team-chat'] and fdb[str(message.guild.id)+'team-uato']!='off'):  #team-chat
             await message.channel.send(
                 'You have received a one warning point for using .say command here once your points exceed 2 you will lose your access to this channel the warning points are reset daily but the access cannot be reteived without intervention'
             )
