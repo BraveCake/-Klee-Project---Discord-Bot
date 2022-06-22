@@ -21,6 +21,8 @@ from PIL import ImageFont
 import pytube
 from database import Database
 from forumTitles import ForumTitles
+from io import StringIO
+
 
 fdb = Database()
 #fdb['dashboard'] = 'klee-dashboard'  #dashboard = name of the channel in which you can have highest acces to klee
@@ -1427,7 +1429,9 @@ async def on_message(message):
     elif message.content.startswith('!vf '):
         url = message.content.split(' ', 1)[1]
         result = connect2forum(url)
-        await message.channel.send(result)
+        buffer = StringIO(result)
+        f = discord.File(buffer, filename="forum.txt")
+        await message.channel.send(file=ff)
 
         message.channel.send()
     elif ms.startswith('!convert'):
