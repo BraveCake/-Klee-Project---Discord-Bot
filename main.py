@@ -1431,7 +1431,7 @@ async def on_message(message):
         result = connect2forum(url)
         buffer = StringIO(result)
         f = discord.File(buffer, filename="forum.txt")
-        await message.channel.send(file=ff)
+        await message.channel.send(file=f)
 
         message.channel.send()
     elif ms.startswith('!convert'):
