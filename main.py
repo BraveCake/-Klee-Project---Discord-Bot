@@ -735,8 +735,6 @@ async def on_message(message):
             fdb['(*' + str(message.author.id)] = str(profile)
             return
         if (message.channel.name != 'ig-chat'):  #so-ingame
-            await message.channel.send(
-                "You don't have permission to use this command")
             return
         m = message.content.replace('.say', '')
         await message.delete()
