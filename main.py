@@ -527,6 +527,8 @@ def unwarn(target):
     fdb['(*' + str(target)] = str(profile)
 
 
+def diff_month(d1, d2):
+    return (d1.year - d2.year) * 12 + d1.month - d2.month
 @client.event
 async def on_ready():
     fdb['test']= 'passed'
@@ -619,9 +621,7 @@ async def on_message(message):
                     return
     #fdb['dashboard'] = dashboard
     if (message.content.startswith('!logs')):
-        if(message.guild.id not in HTRUSTED_SERVERS):
-            return
-        if (message.channel.id != int(fdb[str(message.guild.id)+'dashboard'])):  #so-logs
+        if (message.channel.name!='klee-dashboard'):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
             return
@@ -635,12 +635,15 @@ async def on_message(message):
         try:
             date_str = message.content.split(' ', 3)[2]
             sp = datetime.strptime(date_str, '%Y-%m-%d')
+            if (diff_month(datetime.now(),sp)>7):
+                await message.channel.send("maximum length of search duration shouldn't exceed 7 months")
+                return
         except:
             limiter = False
         target = message.content.split(' ', 2)[1]
         if (not message.content.startswith('!logs+')):
             target = message.content.split(' ', 2)[1].lower()
-        tc = client.get_channel(462841576616361987)
+        tc = discord.utils.get(member.guild.channels,name='ig-team-chat')
         delm = await message.channel.send('Gathering data...')
         async for msg in tc.history(limit=None, after=sp):
             if(cancel == True):
@@ -662,9 +665,7 @@ async def on_message(message):
         await message.channel.send(output)
         limiter = False
     elif (message.content.startswith('!lines')):
-        if (message.guild.id not in HTRUSTED_SERVERS):
-            return
-        if (message.channel.id != int(fdb[str(message.guild.id)+'dashboard'])):  #so-logs
+        if (message.channel.name != 'klee-dashboard'):  #so-logs
             await message.channel.send(
                 'You do not have permission to use this command!')
             return
@@ -678,6 +679,9 @@ async def on_message(message):
         try:
             date_str = message.content.split(' ', 3)[2]
             sp = datetime.strptime(date_str, '%Y-%m-%d')
+            if (diff_month(datetime.now(),sp)>7):
+                await message.channel.send("maximum length of search duration shouldn't exceed 7 months")
+                return
             target = message.content.split(' ', 2)[1]
         except:
             limiter = False
@@ -692,7 +696,7 @@ async def on_message(message):
         for t in target:
             t = t.strip()
             f = open(t + ' ' + date_str + '.txt', 'w+')
-            tc = client.get_channel(462841576616361987)
+            tc = discord.utils.get(member.guild.channels,name='ig-team-chat')
             # 462841576616361987
             delm = await message.channel.send('Gathering data...')
             async for msg in tc.history(limit=None, after=sp):
@@ -1704,11 +1708,9 @@ Show new replies to your posts.""",'',1)
         await message.channel.send('>>> Your current balance is $' + str(bal))
     elif message.content=='!cancel':
       if (message.channel.name != 'klee-dashboard'):
-        cancel = True
-        await react(message,0)
-
-
-
+          return
+      cancel = True
+      await react(message,0)
     elif message.content == '!rich':
         sorted_dic = {}
         for l in fdb.keys():
