@@ -1429,7 +1429,10 @@ async def on_message(message):
     elif message.content.startswith('!vf '):
         url = message.content.split(' ', 1)[1]
         result = connect2forum(url)
-        result = BeautifulSoup(result ,'html.parser').get_text().replace("""Hey, Klee
+        result = BeautifulSoup(result, 'html.parser')
+        for quoate in result.find_all('blockquote'):
+            quoate.string= '«'+quoate.string+'»\n'
+        result = result.get_text().replace("""Hey, Klee
 Show unread posts since last visit.
 Show new replies to your posts.""",'',1)
         buffer = StringIO(result)

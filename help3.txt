@@ -28,6 +28,8 @@ the following 4 commands can be used to get info about the players amount in cit
 
 !extensions : use it to view our unique extensions (discord & forum extensions are there)
 
+!vf forum_topic_url : gives a text file contains the information of the given forum page, it's a useful command to avoid opening the cit forum
+
 __ Most Recent updates __
 --**Klee will not longer receive the same amount of the support/regular updates from the developer**
 --** Made Klee for public usage, all discord TOS must be followed while using it **
