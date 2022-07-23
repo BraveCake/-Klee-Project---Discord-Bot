@@ -780,7 +780,8 @@ async def on_message(message):
     elif message.content =='!average':
       await message.add_reaction('✅')
       statistics = await teamStatistics(message)
-      await message.channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(datetime.now())+'\nfirst message sent today: '+statistics[2])
+      ldate = datetime.now()
+      await message.channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(ldate)+'\nfirst message sent today: '+statistics[2]+"\n Note: used timezone is "+str(ldate.strftime("%z%Z")))
     elif message.content.startswith('!vote'):
         topic = message.content.split(' ',1)[1]
         type=''
@@ -1703,6 +1704,7 @@ Show new replies to your posts.""",'',1)
     elif message.content=='!cancel':
       if (message.channel.name != 'klee-dashboard'):
           return
+      limiter= False
       cancel = True
       await react(message,0)
     elif message.content == '!rich':
