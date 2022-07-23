@@ -53,7 +53,7 @@ async def react(message,code):
 async def teamStatistics(message):
       hits =0
       details= [0]*24
-      yesterday =datetime.now()
+      yesterday =datetime.utcnow()
       yesterday = yesterday - timedelta(hours=yesterday.hour,minutes=yesterday.minute,seconds=yesterday.second)
       tc = discord.utils.get(message.guild.channels,name=fdb[str(message.guild.id)+'ig-team-chat'])
       first = ''
@@ -781,7 +781,7 @@ async def on_message(message):
       await message.add_reaction('✅')
       statistics = await teamStatistics(message)
       ldate = datetime.now()
-      await message.channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(ldate)+'\nfirst message sent today: '+statistics[2]+"\n Note: used timezone is "+str(ldate.strftime("%z%Z")))
+      await message.channel.send('Total messages sent today: '+str(statistics[1])+'\nDetails:'+str(statistics[0])+'\nAverage: '+str(statistics[1]/24)+' message/hour\ncalculated at: '+str(ldate)+'\nfirst message sent today: '+statistics[2]+"\n Note: used timezone is +0 GMT/UTC")
     elif message.content.startswith('!vote'):
         topic = message.content.split(' ',1)[1]
         type=''
